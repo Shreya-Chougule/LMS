@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/forms.css">
+  <style>
+    .quiz-shell {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .quiz-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--bg-glass-border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .quiz-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--text-muted);
+      font-size: var(--font-sm);
+    }
+
+    .quiz-question {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .quiz-question h3 {
+      margin-bottom: 14px;
+    }
+
+    .quiz-option {
+      width: 100%;
+      text-align: left;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .quiz-option:hover {
+      transform: translateY(-1px);
+      border-color: var(--primary-light);
+      background: rgba(108, 92, 231, 0.10);
+    }
+
+    .quiz-option input {
+      accent-color: var(--primary-light);
+    }
+
+    .quiz-option.selected {
+      border-color: var(--primary-light);
+      background: rgba(108, 92, 231, 0.14);
+    }
+
+    .quiz-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .result-banner {
+      text-align: center;
+      padding: 28px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+    }
+
+    .timer-badge {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(253, 203, 110, 0.15);
+      color: var(--warning);
+      font-weight: 700;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary-light);
+      text-decoration: none;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-gradient-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <main class="quiz-shell">
+    <a class="back-link" href="../learning-page.html">← Back to learning page</a>
+
+    <div class="quiz-card" id="quizContainer">
+      <div style="text-align:center;padding:24px;color:var(--text-muted)">Loading quiz...</div>
+    </div>
+  </main>
+
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth-guard.js" data-role="student"></script>
+  <script>
+    let quizData = null;
+    let selectedAnswers = {};
+    let timerId = null;
+    let timeLeft = 0;
+
+    document.addEventListener('DOMContentLoaded', loadQuizPage);
+
+    async function loadQuizPage() {
+      const params = new URLSearchParams(window.location.search);
+      const quizId = params.get('quiz');
+      if (!quizId) {
+        renderError('Quiz ID is missing.');
+        return;
+      }
+
+      try {
+        const [data, results] = await Promise.all([
+          apiRequest(`/quizzes/${quizId}`),
+          apiRequest('/quizzes/results/my')
+        ]);
+
+        quizData = data;
+
+        const existingAttempt = Array.isArray(results)
+          ? results.find(result => String(result.quiz_id) === String(quizId))
+          : null;
+
+        if (existingAttempt) {
+          renderAttempted(existingAttempt);
+          return;
+        }
+
+        selectedAnswers = {};
+
+        const timeLimit = Number(quizData.time_limit || 0);
+        if (timeLimit > 0) {
+          timeLeft = timeLimit * 60;
+          startTimer();
+        }
+
+        renderQuiz();
+      } catch (error) {
+        console.error('Failed to load quiz:', error);
+        renderError('Unable to load this quiz right now.');
+      }
+    }
+
+    function normalizeOptions(question) {
+      const raw = question.options;
+      if (Array.isArray(raw)) return raw;
+      if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return raw.split('|').map(v => v.trim()).filter(Boolean);
+        }
+      }
+      return [];
+    }
+
+    function renderQuiz() {
+      if (!quizData) return;
+
+      const quizQuestions = quizData.quiz_questions || [];
+      const passingScore = quizData.passing_score || 70;
+      const timeLimit = quizData.time_limit ? `${quizData.time_limit} min` : 'No timer';
+
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = `
+        <div class="quiz-header">
+          <div>
+            <h1 style="margin:0 0 6px">${quizData.title}</h1>
+            <p style="color:var(--text-secondary);margin:0">${quizData.description || 'Answer all questions and submit your quiz.'}</p>
+            <div class="quiz-meta">
+              <span>${quizQuestions.length} question${quizQuestions.length !== 1 ? 's' : ''}</span>
+              <span>Passing score: ${passingScore}%</span>
+              <span>${timeLimit}</span>
+            </div>
+          </div>
+          ${quizData.time_limit ? '<div class="timer-badge" id="quizTimer">Loading timer...</div>' : ''}
+        </div>
+
+        <div id="quizQuestions"></div>
+
+        <div class="quiz-actions">
+          <button class="btn btn-secondary" onclick="window.location.href='../learning-page.html?id=' + encodeURIComponent(quizData.course_id)">Cancel</button>
+          <button class="btn btn-primary" onclick="submitQuizAttempt()">Submit Quiz</button>
+        </div>
+      `;
+
+      const questionsContainer = document.getElementById('quizQuestions');
+      questionsContainer.innerHTML = quizQuestions.map((question, index) => {
+        const options = normalizeOptions(question);
+        return `
+          <div class="quiz-question">
+            <h3>Question ${index + 1}</h3>
+            <p style="margin-bottom:16px">${question.question_text || question.question || ''}</p>
+            <div>
+              ${options.map((option, optionIndex) => {
+          const optionValue = String(option);
+          const inputId = `q_${question.id}_${optionIndex}`;
+          const selected = selectedAnswers[question.id] === optionValue;
+          return `
+                  <label class="quiz-option ${selected ? 'selected' : ''}" for="${inputId}">
+                    <input type="radio" id="${inputId}" name="question_${question.id}" value="${escapeHtml(optionValue)}" ${selected ? 'checked' : ''} onchange="selectQuizAnswer('${question.id}', this.value)">
+                    <span>${optionValue}</span>
+                  </label>
+                `;
+        }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (quizData.time_limit) updateTimerLabel();
+    }
+
+    function selectQuizAnswer(questionId, value) {
+      selectedAnswers[questionId] = value;
+      renderQuiz();
+    }
+
+    async function submitQuizAttempt() {
+      if (!quizData) return;
+
+      const questions = quizData.quiz_questions || [];
+      const unanswered = questions.filter(q => !selectedAnswers[q.id]).length;
+      if (unanswered > 0) {
+        showToast(`Please answer all questions. ${unanswered} question(s) left.`, 'error');
+        return;
+      }
+
+      const submitButton = document.querySelector('.quiz-actions .btn-primary');
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Submitting...';
+      }
+
+      try {
+        const payload = { answers: selectedAnswers };
+        const result = await apiRequest(`/quizzes/${quizData.id}/submit`, 'POST', payload);
+        clearInterval(timerId);
+
+        const score = result.score || 0;
+        const passed = !!result.passed;
+        const container = document.getElementById('quizContainer');
+        container.innerHTML = `
+          <div class="result-banner">
+            <div style="font-size:4rem;margin-bottom:12px">${passed ? '🎉' : '📘'}</div>
+            <h2 style="margin-bottom:10px">${passed ? 'Quiz Passed!' : 'Quiz Completed'}</h2>
+            <p style="color:var(--text-secondary);margin-bottom:22px">${result.message || 'Your quiz has been submitted.'}</p>
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:120px;height:120px;border-radius:50%;border:4px solid ${passed ? 'var(--success)' : 'var(--warning)'};margin-bottom:18px">
+              <span style="font-size:2rem;font-weight:800;color:${passed ? 'var(--success)' : 'var(--warning)'}">${score}%</span>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+              <a class="btn btn-primary" href="quiz-results.html">View Results</a>
+              <a class="btn btn-secondary" href="../learning-page.html?id=${encodeURIComponent(quizData.course_id)}">Back to Course</a>
+            </div>
+          </div>
+        `;
+        showToast(result.message || 'Quiz submitted successfully', passed ? 'success' : 'info');
+      } catch (error) {
+        console.error('Quiz submit error:', error);
+        showToast(error.message || 'Failed to submit quiz', 'error');
+        const submitButtonRetry = document.querySelector('.quiz-actions .btn-primary');
+        if (submitButtonRetry) {
+          submitButtonRetry.disabled = false;
+          submitButtonRetry.textContent = 'Submit Quiz';
+        }
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timerId);
+      updateTimerLabel();
+      timerId = setInterval(() => {
+        timeLeft -= 1;
+        updateTimerLabel();
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          showToast('Time is up. Submitting quiz...', 'warning');
+          submitQuizAttempt();
+        }
+      }, 1000);
+    }
+
+    function updateTimerLabel() {
+      const timerEl = document.getElementById('quizTimer');
+      if (!timerEl) return;
+      timerEl.textContent = `Time left: ${formatTime(timeLeft)}`;
+    }
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function renderError(message) {
+      document.getElementById('quizContainer').innerHTML = `
+        <div style="text-align:center;padding:28px">
+          <h2 style="margin-bottom:10px">Quiz unavailable</h2>
+          <p style="color:var(--text-secondary);margin-bottom:18px">${message}</p>
+          <a class="btn btn-primary" href="../learning-page.html">Back to learning page</a>
+        </div>
+      `;
+    }
+
+    function renderAttempted(attempt) {
+      const score = attempt.score || 0;
+      const passed = !!attempt.passed;
+      document.getElementById('quizContainer').innerHTML = `
+        <div class="result-banner">
+          <div style="font-size:4rem;margin-bottom:12px">${passed ? '🎉' : '✅'}</div>
+          <h2 style="margin-bottom:10px">Quiz already submitted</h2>
+          <p style="color:var(--text-secondary);margin-bottom:18px">You can only attempt this quiz once.</p>
+          <div style="display:inline-flex;align-items:center;justify-content:center;width:120px;height:120px;border-radius:50%;border:4px solid ${passed ? 'var(--success)' : 'var(--warning)'};margin-bottom:18px">
+            <span style="font-size:2rem;font-weight:800;color:${passed ? 'var(--success)' : 'var(--warning)'}">${score}%</span>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <a class="btn btn-primary" href="quiz-results.html">View Results</a>
+            <a class="btn btn-secondary" href="../learning-page.html?id=${encodeURIComponent(quizData?.course_id || '')}">Back to Course</a>
+          </div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+
+</html>

@@ -1,180 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Instructor Dashboard — LearnHub</title>
+  <title>Student Dashboard — LearnHub</title>
   <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/navbar.css">
   <link rel="stylesheet" href="../assets/css/dashboard.css">
   <link rel="stylesheet" href="../assets/css/course.css">
 </head>
+
 <body>
-<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
-<div id="sidebar-placeholder"></div>
-<div class="dashboard-content">
-  <div class="dashboard-header animate-fade-in-up">
-    <h1>Welcome, <span class="text-gradient user-display-first-name">Dr. Sarah</span> 👋</h1>
-    <p>Here's your teaching overview</p>
+  <div class="bg-gradient-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+  <div id="sidebar-placeholder"></div>
+  <div class="dashboard-content" id="dashboardContent">
+    <button class="btn btn-icon btn-secondary mobile-sidebar-toggle"
+      style="position:fixed;top:16px;left:16px;z-index:101;display:none" id="mobileSidebarBtn">☰</button>
+
+    <div class="dashboard-header animate-fade-in-up">
+      <h1>Welcome back, <span class="text-gradient user-display-first-name">Student</span> 👋</h1>
+      <p>Continue your learning journey. You're doing great!</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(108,92,231,0.15);color:var(--primary-light)">📖</div>
+        <div class="stat-value" id="stat-enrolled">—</div>
+        <div class="stat-label">Enrolled Courses</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(0,206,201,0.15);color:var(--accent)">✓</div>
+        <div class="stat-value" id="stat-completed">—</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(253,121,168,0.15);color:var(--warm)">🏆</div>
+        <div class="stat-value" id="stat-certificates">—</div>
+        <div class="stat-label">Certificates</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(253,203,110,0.15);color:var(--warning)">🔥</div>
+        <div class="stat-value" id="stat-in-progress">—</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+    </div>
+
+    <!-- Continue Learning -->
+    <div class="dashboard-card mb-xl">
+      <div class="dashboard-card-header">
+        <h3>Continue Learning</h3><a href="my-courses.html"
+          style="color:var(--primary-light);font-size:var(--font-sm)">View All →</a>
+      </div>
+      <div class="dashboard-card-body">
+        <div id="continueLearning"
+          style="display:flex;gap:var(--space-lg);overflow-x:auto;padding-bottom:var(--space-sm)">
+          <p style="color:var(--text-muted);font-size:var(--font-sm)">Loading your courses...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard grid -->
+    <div class="dashboard-grid">
+      <!-- Recent Activity -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h3>Recent Activity</h3>
+        </div>
+        <div class="dashboard-card-body">
+          <div class="activity-list" id="recentActivity">
+            <p style="color:var(--text-muted);font-size:var(--font-sm)">Loading activity...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h3>Quick Actions</h3>
+        </div>
+        <div class="dashboard-card-body">
+          <div class="quick-access-grid">
+            <a href="../course-catalog.html" class="quick-access-item"><span class="qa-icon">🔍</span><span>Browse
+                Courses</span></a>
+            <a href="my-courses.html" class="quick-access-item"><span class="qa-icon">📚</span><span>My
+                Courses</span></a>
+            <a href="certificates.html" class="quick-access-item"><span
+                class="qa-icon">🏆</span><span>Certificates</span></a>
+            <a href="../course-catalog.html" class="quick-access-item"><span class="qa-icon">⭐</span><span>Top
+                Rated</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-icon" style="background:rgba(108,92,231,0.15);color:var(--primary-light)">📖</div><div class="stat-value" id="active-courses-count">—</div><div class="stat-label">Active Courses</div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:rgba(0,206,201,0.15);color:var(--accent)">👥</div><div class="stat-value" id="total-students-count">—</div><div class="stat-label">Total Students</div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:rgba(253,203,110,0.15);color:var(--warning)">⭐</div><div class="stat-value" id="avg-rating">—</div><div class="stat-label">Average Rating</div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:rgba(0,184,148,0.15);color:var(--success)">💰</div><div class="stat-value" id="total-revenue">—</div><div class="stat-label">Total Revenue</div></div>
-  </div>
+  <script src="../assets/js/auth-guard.js" data-role="student"></script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/sidebar.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script>
+    const categoryIcons = {
+      'Web Development': '💻', 'Data Science': '📊', 'Design': '🎨',
+      'Cloud Computing': '☁️', 'Mobile Development': '📱', 'Cybersecurity': '🔒',
+      'Marketing': '📈', 'Blockchain': '⛓️', 'DevOps': '⚙️', 'Business': '💼'
+    };
 
-  <div class="dashboard-grid">
-    <!-- Recent enrollments -->
-    <div class="dashboard-card">
-      <div class="dashboard-card-header"><h3>Recent Enrollments</h3></div>
-      <div class="dashboard-card-body">
-        <div class="activity-list" id="recent-enrollments">
-          <p style="color:var(--text-muted);font-size:var(--font-sm)">Loading...</p>
-        </div>
-      </div>
-    </div>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadComponent('sidebar-placeholder', '../components/sidebar-student.html');
 
-    <!-- Quick Actions -->
-    <div class="dashboard-card">
-      <div class="dashboard-card-header"><h3>Quick Actions</h3></div>
-      <div class="dashboard-card-body">
-        <div class="quick-access-grid">
-          <a href="create-course.html" class="quick-access-item"><span class="qa-icon">➕</span><span>Create Course</span></a>
-          <a href="upload-lessons.html" class="quick-access-item"><span class="qa-icon">📤</span><span>Upload Lesson</span></a>
-          <a href="create-quiz.html" class="quick-access-item"><span class="qa-icon">❓</span><span>Create Quiz</span></a>
-          <a href="analytics.html" class="quick-access-item"><span class="qa-icon">📊</span><span>View Analytics</span></a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pending Reviews -->
-    <div class="dashboard-card">
-      <div class="dashboard-card-header"><h3>Pending Reviews</h3><span class="badge badge-warning">5 pending</span></div>
-      <div class="dashboard-card-body">
-        <div class="activity-list">
-          <div class="activity-item"><div class="activity-icon" style="background:rgba(253,203,110,0.15);color:var(--warning)">📝</div><div class="activity-info"><h4>CSS Layout Assignment — Alex Johnson</h4><p>Submitted 3 hours ago</p></div><button class="btn btn-secondary btn-sm" onclick="showToast('Opening review...','info')">Review</button></div>
-          <div class="activity-item"><div class="activity-icon" style="background:rgba(253,203,110,0.15);color:var(--warning)">📝</div><div class="activity-info"><h4>HTML Structure — Maria Garcia</h4><p>Submitted yesterday</p></div><button class="btn btn-secondary btn-sm" onclick="showToast('Opening review...','info')">Review</button></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Course Performance -->
-    <div class="dashboard-card">
-      <div class="dashboard-card-header"><h3>Course Performance</h3></div>
-      <div class="dashboard-card-body">
-        <div id="course-performance-list" style="display:flex;flex-direction:column;gap:var(--space-lg)">
-          <p style="color:var(--text-muted);font-size:var(--font-sm)">Loading...</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<script src="../assets/js/auth-guard.js" data-role="instructor"></script>
-<script src="../assets/js/main.js"></script>
-<script src="../assets/js/sidebar.js"></script>
-<script src="../assets/js/api.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  loadComponent('sidebar-placeholder', '../components/sidebar-instructor.html');
-
-  const user = JSON.parse(localStorage.getItem('lms_user') || '{}');
-  if (!user.id) return;
-
-  loadRecentEnrollments();
-
-  apiRequest(`/courses?instructor_id=${user.id}`).then(courses => {
-    // Active Courses count
-    document.getElementById('active-courses-count').textContent = courses.length;
-
-    // Compute stats from course data
-    let totalStudents = 0;
-    let totalRevenue = 0;
-    let ratingSum = 0;
-    let ratingCount = 0;
-
-    courses.forEach(c => {
-      totalStudents += (c.enrolled_count || 0);
-      totalRevenue += (c.price || 0) * (c.enrolled_count || 0);
-      if (c.rating) {
-        ratingSum += c.rating;
-        ratingCount++;
+      if (window.innerWidth <= 1024) {
+        const btn = document.getElementById('mobileSidebarBtn');
+        if (btn) btn.style.display = 'flex';
       }
+
+      loadDashboardData();
     });
 
-    document.getElementById('total-students-count').textContent =
-      totalStudents >= 1000 ? (totalStudents / 1000).toFixed(1) + 'K' : totalStudents;
-    document.getElementById('total-revenue').textContent = '₹' +
-      (totalRevenue >= 1000 ? (totalRevenue / 1000).toFixed(1) + 'K' : totalRevenue);
-    document.getElementById('avg-rating').textContent =
-      ratingCount > 0 ? (ratingSum / ratingCount).toFixed(1) : 'N/A';
+    async function loadDashboardData() {
+      try {
+        const [enrollmentsResult, quizResultsResult, assignmentsResult] = await Promise.allSettled([
+          apiRequest('/enrollments/my'),
+          apiRequest('/quizzes/results/my'),
+          apiRequest('/assignments/my')
+        ]);
 
-    // Course Performance
-    const list = document.getElementById('course-performance-list');
-    if (!courses.length) {
-      list.innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">No courses yet.</p>';
-      return;
-    }
-    list.innerHTML = courses.map(c => `
-      <div style="background:var(--bg-glass);border-radius:var(--radius-md);padding:var(--space-lg)">
-        <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm)">
-          <h5 style="font-size:var(--font-sm)">${c.title}</h5>
-          <span style="color:var(--success);font-weight:600">⭐ ${c.rating || 'N/A'}</span>
-        </div>
-        <div style="display:flex;gap:var(--space-xl);font-size:var(--font-xs);color:var(--text-muted)">
-          <span>${c.level || ''}</span>
-          <span>₹${c.price ?? 0}</span>
-        </div>
-      </div>`).join('');
-  }).catch(() => {
-    document.getElementById('active-courses-count').textContent = '—';
-    document.getElementById('course-performance-list').innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">Failed to load.</p>';
-  });
-});
-async function loadRecentEnrollments() {
-  const el = document.getElementById('recent-enrollments');
-  try {
-    const enrollments = await apiRequest('/enrollments/instructor?limit=5');
-    if (!enrollments.length) {
-      el.innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">No enrollments yet.</p>';
-      return;
-    }
-    const colors = [
-      'rgba(108,92,231,0.15);color:var(--primary-light)',
-      'rgba(0,206,201,0.15);color:var(--accent)',
-      'rgba(253,121,168,0.15);color:var(--warm)',
-      'rgba(253,203,110,0.15);color:var(--warning)'
-    ];
-    el.innerHTML = enrollments.map((e, i) => {
-      const studentName = e.users?.name || 'A student';
-      const courseTitle = e.courses?.title || 'a course';
-      const timeAgo = formatTimeAgo(e.enrolled_at);
-      const color = colors[i % colors.length];
-      return `
-        <div class="activity-item">
-          <div class="activity-icon" style="background:${color.split(';')[0]};${color.split(';')[1]}">👤</div>
-          <div class="activity-info">
-            <h4>${studentName} enrolled in ${courseTitle}</h4>
-            <p>${timeAgo}</p>
-          </div>
+        const enrollments = enrollmentsResult.status === 'fulfilled' ? enrollmentsResult.value : [];
+        const quizResults = quizResultsResult.status === 'fulfilled' ? quizResultsResult.value : [];
+        const assignmentSubmissions = assignmentsResult.status === 'fulfilled' ? assignmentsResult.value : [];
+
+        // --- Stats ---
+        const total = enrollments.length;
+        const completed = enrollments.filter(e => e.completed_at).length;
+        const inProgress = total - completed;
+
+        document.getElementById('stat-enrolled').textContent = total;
+        document.getElementById('stat-completed').textContent = completed;
+        document.getElementById('stat-certificates').textContent = completed; // certificates = completed courses
+        document.getElementById('stat-in-progress').textContent = inProgress;
+
+        // --- Continue Learning ---
+        const container = document.getElementById('continueLearning');
+        const activeCourses = enrollments.filter(e => !e.completed_at);
+
+        if (!activeCourses.length) {
+          container.innerHTML = `
+        <div style="text-align:center;padding:var(--space-xl);color:var(--text-muted);width:100%">
+          <p style="font-size:1.5rem;margin-bottom:var(--space-sm)">📚</p>
+          <p>No courses in progress.</p>
+          <a href="../course-catalog.html" class="btn btn-primary btn-sm mt-md ripple-effect">Browse Courses →</a>
         </div>`;
-    }).join('');
-  } catch (err) {
-    el.innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">Failed to load enrollments.</p>';
-  }
-}
+          return;
+        }
 
-function formatTimeAgo(dateStr) {
-  if (!dateStr) return '';
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return mins <= 1 ? 'Just now' : `${mins} minutes ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return hrs === 1 ? '1 hour ago' : `${hrs} hours ago`;
-  const days = Math.floor(hrs / 24);
-  if (days === 1) return 'Yesterday';
-  return `${days} days ago`;
-}
-</script>
+        container.innerHTML = activeCourses.map(enrollment => {
+          const c = enrollment.courses;
+          if (!c) return '';
+          const icon = categoryIcons[c.category] || '📚';
+          const progress = enrollment.progress || 0;
+          const instructorName = c.instructor_name || c.users?.name || 'Instructor';
+
+          return `
+        <div style="min-width:320px;background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:var(--space-lg);flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md)">
+            <span style="font-size:2rem">${icon}</span>
+            <div>
+              <h5 style="font-size:var(--font-md)">${c.title}</h5>
+              <p style="font-size:var(--font-xs);color:var(--text-muted)">${instructorName}</p>
+            </div>
+          </div>
+          <div class="progress-bar mb-sm"><div class="progress-fill" style="width:${progress}%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:var(--font-xs);color:var(--text-muted)">
+            <span>${progress}% complete</span>
+            <span>${c.level || ''}</span>
+          </div>
+          <a href="../learning-page.html?id=${c.id}" class="btn btn-primary btn-sm w-full mt-md ripple-effect">Continue →</a>
+        </div>`;
+        }).join('');
+
+        // --- Recent Activity ---
+        const activityEl = document.getElementById('recentActivity');
+        const activityItems = [];
+
+        enrollments.forEach(e => {
+          const c = e.courses;
+          if (!c) return;
+          activityItems.push({
+            type: 'course',
+            title: e.completed_at ? `Completed course "${c.title}"` : `Enrolled in "${c.title}"`,
+            date: e.completed_at || e.enrolled_at,
+            icon: e.completed_at ? '✓' : '📖',
+            tone: e.completed_at ? 'success' : 'primary'
+          });
+        });
+
+        quizResults.forEach(result => {
+          const quizTitle = result.quizzes?.title || 'Quiz';
+          activityItems.push({
+            type: 'quiz',
+            title: `Completed quiz "${quizTitle}"${result.passed ? ' (passed)' : ''}`,
+            date: result.submitted_at,
+            icon: '❓',
+            tone: result.passed ? 'success' : 'warning',
+            meta: `${result.score || 0}% score`
+          });
+        });
+
+        assignmentSubmissions.forEach(submission => {
+          const assignmentTitle = submission.assignments?.title || 'Assignment';
+          const isGraded = submission.status === 'graded';
+          activityItems.push({
+            type: 'assignment',
+            title: `${isGraded ? 'Graded' : 'Completed'} assignment "${assignmentTitle}"`,
+            date: submission.graded_at || submission.submitted_at,
+            icon: '📝',
+            tone: isGraded ? 'success' : 'primary',
+            meta: submission.score != null ? `${submission.score}/${submission.assignments?.max_score || 100}` : 'Submitted'
+          });
+        });
+
+        activityItems.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+        if (activityItems.length) {
+          const recent = activityItems.slice(0, 6);
+          activityEl.innerHTML = recent.map(item => {
+            const date = item.date ? new Date(item.date).toLocaleDateString() : '';
+            return `
+          <div class="activity-item">
+            <div class="activity-icon" style="background:${item.tone === 'success' ? 'rgba(0,184,148,0.15);color:var(--success)' : item.tone === 'warning' ? 'rgba(253,203,110,0.15);color:var(--warning)' : 'rgba(108,92,231,0.15);color:var(--primary-light)'}">
+              ${item.icon}
+            </div>
+            <div class="activity-info">
+              <h4>${item.title}</h4>
+              <p>${date}${item.meta ? ` · ${item.meta}` : ''}</p>
+            </div>
+          </div>`;
+          }).join('');
+        } else {
+          activityEl.innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">No activity yet. Enroll in a course to get started!</p>';
+        }
+
+      } catch (err) {
+        console.error('Dashboard load error:', err);
+        document.getElementById('continueLearning').innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">Unable to load data. Please try again.</p>';
+      }
+    }
+  </script>
 </body>
+
 </html>

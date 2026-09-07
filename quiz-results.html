@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Results — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div id="sidebar-placeholder"></div>
+<div class="dashboard-content">
+  <div class="dashboard-header animate-fade-in-up">
+    <h1>Quiz <span class="text-gradient">Results</span></h1>
+    <p>Review your quiz performance and scores</p>
+  </div>
+
+  <div class="stats-grid mb-xl">
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(0,184,148,0.15);color:var(--success)">📊</div><div class="stat-value" id="stat-quizzes-taken">-</div><div class="stat-label">Quizzes Taken</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(108,92,231,0.15);color:var(--primary-light)">🎯</div><div class="stat-value" id="stat-avg-score">-</div><div class="stat-label">Average Score</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(0,206,201,0.15);color:var(--accent)">✓</div><div class="stat-value" id="stat-passed">-</div><div class="stat-label">Passed</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(253,203,110,0.15);color:var(--warning)">🏆</div><div class="stat-value" id="stat-best-score">-</div><div class="stat-label">Best Score</div></div>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="dashboard-card-header"><h3>All Quiz Results</h3></div>
+    <div class="dashboard-card-body">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Quiz</th><th>Course</th><th>Score</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody id="quizResultsTableBody">
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:var(--space-xl)">Loading your quiz results...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/js/auth-guard.js" data-role="student"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/sidebar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  loadComponent('sidebar-placeholder', '../components/sidebar-student.html');
+  loadQuizResults();
+});
+
+async function loadQuizResults() {
+  try {
+    const results = await apiRequest('/quizzes/results/my');
+    const tbody = document.getElementById('quizResultsTableBody');
+    
+    if (!results || results.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:var(--space-xl)">No quiz results found.</td></tr>';
+      document.getElementById('stat-quizzes-taken').textContent = '0';
+      document.getElementById('stat-avg-score').textContent = '0%';
+      document.getElementById('stat-passed').textContent = '0';
+      document.getElementById('stat-best-score').textContent = '0%';
+      return;
+    }
+
+    // Calculate stats
+    const total = results.length;
+    let passed = 0;
+    let totalScore = 0;
+    let bestScore = 0;
+
+    const rows = results.map(r => {
+      const score = r.score || 0;
+      totalScore += score;
+      if (score > bestScore) bestScore = score;
+      const passingScore = r.quizzes?.passing_score || 50;
+      const isPassed = score >= passingScore;
+      if (isPassed) passed++;
+
+      const date = r.completed_at ? new Date(r.completed_at).toLocaleDateString() : 'N/A';
+      const statusBadge = isPassed ? '<span class="badge badge-success">Passed</span>' : '<span class="badge badge-danger">Failed</span>';
+      const scoreColor = isPassed ? 'var(--success)' : 'var(--danger)';
+      
+      return `
+        <tr>
+          <td style="font-weight:500">${r.quizzes?.title || 'Quiz'}</td>
+          <td>${r.quizzes?.courses?.title || 'Course'}</td>
+          <td><span style="font-weight:700;color:${scoreColor}">${score}%</span></td>
+          <td>${statusBadge}</td>
+          <td style="color:var(--text-muted)">${date}</td>
+          <td><button class="btn ${isPassed ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="showToast('${isPassed ? 'Viewing details' : 'Retaking quiz'}','info')">${isPassed ? 'Review' : 'Retake'}</button></td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.innerHTML = rows;
+
+    document.getElementById('stat-quizzes-taken').textContent = total;
+    document.getElementById('stat-avg-score').textContent = Math.round(totalScore / total) + '%';
+    document.getElementById('stat-passed').textContent = passed;
+    document.getElementById('stat-best-score').textContent = bestScore + '%';
+
+  } catch (error) {
+    console.error('Failed to load quiz results', error);
+    document.getElementById('quizResultsTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:var(--space-xl)">Error loading results.</td></tr>';
+  }
+}
+</script>
+</body>
+</html>

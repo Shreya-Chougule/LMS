@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Settings — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/forms.css">
+</head>
+<body>
+<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div id="sidebar-placeholder"></div>
+<div class="dashboard-content">
+  <div class="dashboard-header animate-fade-in-up">
+    <h1>Profile <span class="text-gradient">Settings</span></h1>
+    <p>Manage your account and preferences</p>
+  </div>
+
+  <div class="tabs mb-xl" data-tab-content="profileTabs">
+    <button class="tab-btn active" data-tab="profileTab">Profile</button>
+    <button class="tab-btn" data-tab="securityTab">Security</button>
+    <button class="tab-btn" data-tab="notifTab">Notifications</button>
+  </div>
+
+  <div id="profileTabs">
+    <div class="tab-content active" id="profileTab">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body">
+          <!-- Avatar -->
+          <div style="display:flex;align-items:center;gap:var(--space-xl);margin-bottom:var(--space-2xl)">
+            <div style="position:relative;width:80px;height:80px;flex-shrink:0">
+              <div id="avatarInitial" style="width:80px;height:80px;border-radius:50%;background:var(--primary-gradient);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:white">—</div>
+              <img id="avatarImg" src="" alt="Profile" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;position:absolute;top:0;left:0">
+              <div id="avatarUploadOverlay" onclick="document.getElementById('avatarFileInput').click()" style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;cursor:pointer;font-size:1.2rem">📷</div>
+            </div>
+            <div>
+              <h4 id="displayName">Loading...</h4>
+              <p style="color:var(--text-muted);font-size:var(--font-sm);margin-bottom:var(--space-md)" id="joinDate"></p>
+              <input type="file" id="avatarFileInput" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="handleAvatarUpload(event)">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('avatarFileInput').click()" id="changeAvatarBtn">Change Photo</button>
+            </div>
+          </div>
+          <form onsubmit="handleSaveProfile(event)">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">First Name</label><input class="form-control" id="inputFirstName" placeholder="First name"></div>
+              <div class="form-group"><label class="form-label">Last Name</label><input class="form-control" id="inputLastName" placeholder="Last name"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-control" id="inputEmail" type="email" disabled style="opacity:0.6;cursor:not-allowed"><p style="font-size:var(--font-xs);color:var(--text-muted);margin-top:4px">Email cannot be changed here.</p></div>
+            <div class="form-group"><label class="form-label">Bio</label><textarea class="form-control" id="inputBio" rows="3" placeholder="Tell us about yourself..."></textarea></div>
+            <div class="form-group"><label class="form-label">Phone</label><input class="form-control" id="inputPhone" placeholder="+91 00000 00000"></div>
+            <button type="submit" class="btn btn-primary ripple-effect" id="saveProfileBtn">Save Changes</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="securityTab">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body">
+          <h4 style="margin-bottom:var(--space-lg)">Change Password</h4>
+          <form onsubmit="event.preventDefault();showToast('Password changed!','success')">
+            <div class="form-group"><label class="form-label">Current Password</label><input class="form-control" type="password" placeholder="Enter current password" required></div>
+            <div class="form-group"><label class="form-label">New Password</label><input class="form-control" type="password" placeholder="Enter new password" required></div>
+            <div class="form-group"><label class="form-label">Confirm New Password</label><input class="form-control" type="password" placeholder="Confirm new password" required></div>
+            <button type="submit" class="btn btn-primary ripple-effect">Update Password</button>
+          </form>
+          <div style="margin-top:var(--space-2xl);padding-top:var(--space-xl);border-top:1px solid var(--border-color)">
+            <h4 style="margin-bottom:var(--space-md);color:var(--danger)">Danger Zone</h4>
+            <p style="color:var(--text-secondary);font-size:var(--font-sm);margin-bottom:var(--space-md)">Once you delete your account, there is no going back.</p>
+            <button class="btn btn-danger btn-sm" onclick="showToast('Account deletion is disabled in demo','warning')">Delete Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="notifTab">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body">
+          <h4 style="margin-bottom:var(--space-lg)">Notification Preferences</h4>
+          <div style="display:flex;flex-direction:column;gap:var(--space-lg)">
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md);background:var(--bg-glass);border-radius:var(--radius-md)">
+              <div><p style="font-weight:500">Course Updates</p><p style="font-size:var(--font-xs);color:var(--text-muted)">New lessons and material updates</p></div>
+              <input type="checkbox" checked style="accent-color:var(--primary);width:20px;height:20px">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md);background:var(--bg-glass);border-radius:var(--radius-md)">
+              <div><p style="font-weight:500">Assignment Reminders</p><p style="font-size:var(--font-xs);color:var(--text-muted)">Deadline reminders for assignments</p></div>
+              <input type="checkbox" checked style="accent-color:var(--primary);width:20px;height:20px">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md);background:var(--bg-glass);border-radius:var(--radius-md)">
+              <div><p style="font-weight:500">Discussion Replies</p><p style="font-size:var(--font-xs);color:var(--text-muted)">Replies to your comments</p></div>
+              <input type="checkbox" checked style="accent-color:var(--primary);width:20px;height:20px">
+            </label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md);background:var(--bg-glass);border-radius:var(--radius-md)">
+              <div><p style="font-weight:500">Promotional Emails</p><p style="font-size:var(--font-xs);color:var(--text-muted)">Course offers and discounts</p></div>
+              <input type="checkbox" style="accent-color:var(--primary);width:20px;height:20px">
+            </label>
+          </div>
+          <button class="btn btn-primary mt-xl ripple-effect" onclick="showToast('Preferences saved!','success')">Save Preferences</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/js/auth-guard.js" data-role="student"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/sidebar.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/storage.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  loadComponent('sidebar-placeholder', '../components/sidebar-student.html');
+  initTabs();
+  loadProfile();
+
+  // Show camera overlay on hover
+  const avatarWrap = document.getElementById('avatarImg').parentElement;
+  const overlay = document.getElementById('avatarUploadOverlay');
+  avatarWrap.addEventListener('mouseenter', () => overlay.style.display = 'flex');
+  avatarWrap.addEventListener('mouseleave', () => overlay.style.display = 'none');
+});
+
+function setAvatarDisplay(url) {
+  const img = document.getElementById('avatarImg');
+  const initial = document.getElementById('avatarInitial');
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+    initial.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    initial.style.display = 'flex';
+  }
+}
+
+async function loadProfile() {
+  try {
+    const user = await apiRequest('/users/profile');
+
+    const name = user.name || '';
+    const parts = name.split(' ');
+    const firstName = parts[0] || '';
+    const lastName = parts.slice(1).join(' ') || '';
+    const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+    const joinDate = user.created_at ? new Date(user.created_at).toLocaleDateString('default', { month: 'short', year: 'numeric' }) : '';
+
+    document.getElementById('avatarInitial').textContent = initials;
+    document.getElementById('displayName').textContent = name;
+    document.getElementById('joinDate').textContent = joinDate ? `Student since ${joinDate}` : 'Student';
+    document.getElementById('inputFirstName').value = firstName;
+    document.getElementById('inputLastName').value = lastName;
+    document.getElementById('inputEmail').value = user.email || '';
+    document.getElementById('inputBio').value = user.bio || '';
+    document.getElementById('inputPhone').value = user.phone || '';
+
+    setAvatarDisplay(user.avatar_url || null);
+  } catch (err) {
+    showToast('Failed to load profile', 'error');
+  }
+}
+
+async function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const error = validateFile(file, 'avatars');
+  if (error) { showToast(error, 'error'); return; }
+
+  const btn = document.getElementById('changeAvatarBtn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+
+  try {
+    const result = await uploadFileToStorage(file, 'avatars', null);
+    const publicUrl = result.publicUrl;
+
+    // Save to DB
+    await apiRequest('/users/profile', 'PUT', { avatar_url: publicUrl });
+
+    // Update localStorage
+    const stored = JSON.parse(localStorage.getItem('lms_user') || '{}');
+    stored.avatar_url = publicUrl;
+    localStorage.setItem('lms_user', JSON.stringify(stored));
+
+    setAvatarDisplay(publicUrl);
+    showToast('Profile photo updated!', 'success');
+  } catch (err) {
+    showToast(err.message || 'Failed to upload photo', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Change Photo';
+    event.target.value = '';
+  }
+}
+
+async function handleSaveProfile(e) {
+  e.preventDefault();
+  const btn = document.getElementById('saveProfileBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const firstName = document.getElementById('inputFirstName').value.trim();
+  const lastName = document.getElementById('inputLastName').value.trim();
+  const name = `${firstName} ${lastName}`.trim();
+
+  try {
+    const updated = await apiRequest('/users/profile', 'PUT', {
+      name,
+      bio: document.getElementById('inputBio').value.trim() || null,
+      phone: document.getElementById('inputPhone').value.trim() || null
+    });
+
+    const stored = JSON.parse(localStorage.getItem('lms_user') || '{}');
+    stored.name = updated.user.name;
+    localStorage.setItem('lms_user', JSON.stringify(stored));
+
+    const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
+    document.getElementById('avatarInitial').textContent = initials;
+    document.getElementById('displayName').textContent = name;
+
+    showToast('Profile updated successfully!', 'success');
+  } catch (err) {
+    showToast(err.message || 'Failed to update profile', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Changes';
+  }
+}
+</script>
+</body>
+</html>

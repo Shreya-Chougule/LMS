@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificates — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div id="sidebar-placeholder"></div>
+<div class="dashboard-content">
+  <div class="dashboard-header animate-fade-in-up">
+    <h1>My <span class="text-gradient">Certificates</span></h1>
+    <p>Download and share your earned certificates</p>
+  </div>
+
+  <div class="dashboard-grid" style="grid-template-columns:repeat(auto-fill,minmax(380px,1fr))" id="certificatesContainer">
+    <div style="grid-column: 1/-1; text-align:center; padding: var(--space-xl); color: var(--text-muted)">
+       Loading your certificates...
+    </div>
+  </div>
+</div>
+<script src="../assets/js/auth-guard.js" data-role="student"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/sidebar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  loadComponent('sidebar-placeholder', '../components/sidebar-student.html');
+  loadCertificates();
+});
+
+async function loadCertificates() {
+  try {
+    const certificates = await apiRequest('/certificates/my');
+    const container = document.getElementById('certificatesContainer');
+
+    if (!certificates || certificates.length === 0) {
+      container.innerHTML = `
+        <div class="dashboard-card animate-fade-in-up" style="grid-column: 1/-1; display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-3xl);text-align:center">
+          <div style="font-size:4rem;margin-bottom:var(--space-lg)">🎯</div>
+          <h4 style="margin-bottom:var(--space-sm)">Earn Certificates</h4>
+          <p style="color:var(--text-secondary);font-size:var(--font-sm);margin-bottom:var(--space-lg)">Complete your enrolled courses to unlock certificates.</p>
+          <a href="my-courses.html" class="btn btn-outline btn-sm">View My Courses →</a>
+        </div>`;
+      return;
+    }
+
+    let html = '';
+    certificates.forEach(cert => {
+      const courseTitle = cert.courses?.title || 'Course Certificate';
+      const studentName = cert.student_name || cert.users?.name || 'Student';
+      const issueDate = new Date(cert.issued_at).toLocaleDateString();
+      const certId = cert.certificate_number || cert.id;
+
+      html += `
+        <div class="dashboard-card animate-fade-in-up">
+          <div style="background:linear-gradient(135deg,rgba(108,92,231,0.2),rgba(0,206,201,0.2));padding:var(--space-2xl);text-align:center;border-bottom:1px solid var(--border-color)">
+            <div style="border:2px solid var(--primary);border-radius:var(--radius-lg);padding:var(--space-xl);background:var(--bg-card)">
+              <p style="font-size:var(--font-xs);color:var(--primary-light);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:var(--space-sm)">Certificate of Completion</p>
+              <h3 style="font-size:var(--font-xl);margin-bottom:var(--space-sm)">${courseTitle}</h3>
+              <p style="color:var(--text-secondary);font-size:var(--font-sm);margin-bottom:var(--space-md)">Awarded to <strong style="color:var(--text-primary)">${studentName}</strong></p>
+              <div style="display:flex;justify-content:center;gap:var(--space-xl)">
+                <div><p style="font-size:var(--font-xs);color:var(--text-muted)">Date</p><p style="font-size:var(--font-sm)">${issueDate}</p></div>
+                <div><p style="font-size:var(--font-xs);color:var(--text-muted)">ID</p><p style="font-size:var(--font-sm)">${certId}</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="dashboard-card-body" style="display:flex;gap:var(--space-md)">
+            <button class="btn btn-primary btn-sm ripple-effect" style="flex:1" onclick="window.open('${cert.pdf_url || '#'}', '_blank')">⬇ Download</button>
+            <button class="btn btn-secondary btn-sm" style="flex:1" onclick="showToast('Share link copied!','success')">🔗 Share</button>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  } catch (error) {
+    console.error('Error loading certificates:', error);
+    document.getElementById('certificatesContainer').innerHTML = `
+      <div style="grid-column: 1/-1; text-align:center; padding: var(--space-xl); color: var(--danger)">
+         Error loading certificates. Please try again later.
+      </div>`;
+  }
+}
+</script>
+</body>
+</html>

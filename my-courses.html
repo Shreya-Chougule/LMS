@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Courses — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/navbar.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+</head>
+<body>
+  <div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+  <div id="sidebar-placeholder"></div>
+  <div class="dashboard-content">
+    <button class="btn btn-icon btn-secondary mobile-sidebar-toggle" style="position:fixed;top:16px;left:16px;z-index:101;display:none" id="mobileSidebarBtn">☰</button>
+    <div class="dashboard-header animate-fade-in-up">
+      <h1>My <span class="text-gradient">Courses</span></h1>
+      <p>Track your enrolled courses and progress</p>
+    </div>
+
+    <div class="tabs mb-xl" data-tab-content="courseTabContent">
+      <button class="tab-btn active" data-tab="enrolledTab" id="enrolledTabBtn">Enrolled (—)</button>
+      <button class="tab-btn" data-tab="completedTab" id="completedTabBtn">Completed (—)</button>
+    </div>
+
+    <div id="courseTabContent">
+      <div class="tab-content active" id="enrolledTab">
+        <div class="course-grid" id="enrolledGrid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">
+          <p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:var(--space-2xl)">Loading courses...</p>
+        </div>
+      </div>
+      <div class="tab-content" id="completedTab">
+        <div class="course-grid" id="completedGrid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">
+          <p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:var(--space-2xl)">Loading courses...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/auth-guard.js" data-role="student"></script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/sidebar.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script>
+  const categoryIcons = {
+    'Web Development': '💻', 'Data Science': '📊', 'Design': '🎨',
+    'Cloud Computing': '☁️', 'Mobile Development': '📱', 'Cybersecurity': '🔒',
+    'Marketing': '📈', 'Blockchain': '⛓️', 'DevOps': '⚙️', 'Business': '💼'
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadComponent('sidebar-placeholder', '../components/sidebar-student.html');
+    if (window.innerWidth <= 1024) {
+      const btn = document.getElementById('mobileSidebarBtn');
+      if (btn) btn.style.display = 'flex';
+    }
+    loadMyCourses();
+  });
+
+  async function loadMyCourses() {
+    try {
+      const enrollments = await apiRequest('/enrollments/my');
+
+      const active = enrollments.filter(e => !e.completed_at);
+      const completed = enrollments.filter(e => !!e.completed_at);
+
+      // Update tab counts
+      document.getElementById('enrolledTabBtn').textContent = `Enrolled (${active.length})`;
+      document.getElementById('completedTabBtn').textContent = `Completed (${completed.length})`;
+
+      // Render enrolled
+      const enrolledGrid = document.getElementById('enrolledGrid');
+      if (!active.length) {
+        enrolledGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:var(--space-2xl);color:var(--text-muted)">
+          <p style="font-size:1.5rem;margin-bottom:var(--space-sm)">📚</p>
+          <p>You haven't enrolled in any courses yet.</p>
+          <a href="../course-catalog.html" class="btn btn-primary btn-sm mt-md ripple-effect">Browse Courses →</a>
+        </div>`;
+      } else {
+        enrolledGrid.innerHTML = active.map(e => renderEnrollmentCard(e, false)).join('');
+      }
+
+      // Render completed
+      const completedGrid = document.getElementById('completedGrid');
+      if (!completed.length) {
+        completedGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:var(--space-2xl);color:var(--text-muted)">
+          <p style="font-size:1.5rem;margin-bottom:var(--space-sm)">🏆</p>
+          <p>No completed courses yet. Keep learning!</p>
+        </div>`;
+      } else {
+        completedGrid.innerHTML = completed.map(e => renderEnrollmentCard(e, true)).join('');
+      }
+
+    } catch (err) {
+      console.error('Load courses error:', err);
+      document.getElementById('enrolledGrid').innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:var(--space-2xl)">Failed to load courses. Please try again.</p>';
+    }
+  }
+
+  function renderEnrollmentCard(enrollment, isCompleted) {
+    const c = enrollment.courses;
+    if (!c) return '';
+    const icon = categoryIcons[c.category] || '📚';
+    const progress = isCompleted ? 100 : (enrollment.progress || 0);
+    const instructorName = c.instructor_name || c.users?.name || 'Instructor';
+
+    return `
+      <div class="course-card">
+        <div class="course-card-image">
+          ${c.thumbnail_url
+            ? `<img src="${c.thumbnail_url}" alt="${c.title}" class="course-img" style="width:100%;height:100%;object-fit:cover">`
+            : `<div class="course-img">${icon}</div>`
+          }
+          ${isCompleted ? '<div class="course-badge badge badge-success">Completed</div>' : ''}
+        </div>
+        <div class="course-card-body">
+          <div class="course-category">${c.category || ''}</div>
+          <h3>${c.title}</h3>
+          <p class="course-instructor">${instructorName}</p>
+          <div class="progress-bar mt-md mb-sm">
+            <div class="progress-fill" style="width:${progress}%;${isCompleted ? 'background:var(--accent-gradient)' : ''}"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:var(--font-xs);color:var(--text-muted)">
+            <span>${progress}% complete</span>
+            ${isCompleted
+              ? `<a href="certificates.html" style="color:var(--primary-light)">View Certificate →</a>`
+              : `<span>${c.level || ''}</span>`
+            }
+          </div>
+          ${!isCompleted
+            ? `<a href="../learning-page.html?id=${c.id}" class="btn btn-primary btn-sm w-full mt-md ripple-effect">Continue Learning</a>`
+            : ''
+          }
+        </div>
+      </div>`;
+  }
+  </script>
+</body>
+</html>
