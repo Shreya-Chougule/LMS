@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LearnHub course learning page with video, lessons, and resources.">
+  <title>Learning — LearnHub</title>
+  <link rel="stylesheet" href="assets/css/global.css">
+  <link rel="stylesheet" href="assets/css/navbar.css">
+  <link rel="stylesheet" href="assets/css/course.css">
+  <link rel="stylesheet" href="assets/css/forms.css">
+</head>
+
+<body>
+  <div id="navbar-placeholder"></div>
+
+  <div class="learning-layout">
+    <!-- Left: Lesson list -->
+    <div class="lesson-sidebar">
+      <div class="lesson-sidebar-header" id="progressInfo">
+        <h3>📖 Course Content</h3>
+        <div class="progress-bar mt-md">
+          <div class="progress-fill" style="width:0%"></div>
+        </div>
+        <p style="font-size:var(--font-xs);color:var(--text-muted);margin-top:var(--space-sm)">0% complete</p>
+      </div>
+      <div style="padding:var(--space-sm)" id="lessonList">
+        <p style="color:var(--text-muted);text-align:center;padding:var(--space-md)">Loading lessons...</p>
+      </div>
+    </div>
+
+    <!-- Center: Video + Content -->
+    <div class="lesson-content-area">
+      <div class="video-container" id="videoContainer">
+        <div class="video-placeholder">
+          <p>Select a lesson from the sidebar to begin.</p>
+        </div>
+      </div>
+      <div class="lesson-text-content">
+        <h2 id="lessonTitle" style="margin-bottom:var(--space-md)">Course Overview</h2>
+        <p id="lessonDescription" style="color:var(--text-secondary);line-height:1.8;margin-bottom:var(--space-xl)">
+          Please select a lesson from the menu on the left.</p>
+
+        <div style="display:flex;gap:var(--space-md);margin-bottom:var(--space-xl)">
+          <button class="btn btn-primary ripple-effect" id="markCompleteBtn" onclick="markLessonComplete()"
+            style="display:none">✓ Mark Complete</button>
+        </div>
+
+        <div id="lessonTextContainer"
+          style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:var(--space-xl);display:none">
+          <div style="color:var(--text-secondary);font-size:var(--font-sm);line-height:1.8" id="lessonTextContent">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Resources panel -->
+    <div class="right-panel">
+      <div class="right-panel-tabs">
+        <button class="active" onclick="switchRightTab(this,'materials')">Materials</button>
+        <button onclick="switchRightTab(this,'discussion')">Discussion</button>
+        <button onclick="switchRightTab(this,'quiz')">Quiz</button>
+      </div>
+
+      <!-- Materials -->
+      <div class="right-panel-content" id="materials">
+        <h5 style="margin-bottom:var(--space-lg)">Resources</h5>
+        <div id="materialsList" style="display:flex;flex-direction:column;gap:var(--space-sm)">
+          <p style="color:var(--text-muted);font-size:var(--font-sm)">Select a lesson to view resources.</p>
+        </div>
+      </div>
+
+      <!-- Discussion -->
+      <div class="right-panel-content" id="discussion" style="display:none">
+        <h5 style="margin-bottom:var(--space-lg)">Discussion (3)</h5>
+        <div class="discussion-item">
+          <div class="discussion-header">
+            <div class="discussion-avatar">MG</div><span class="discussion-name">Maria Garcia</span><span
+              class="discussion-time" style="margin-left:auto">2h ago</span>
+          </div>
+          <p class="discussion-text">Having trouble installing Node.js on Mac. Getting a permission error. Any
+            suggestions?</p>
+        </div>
+        <div class="discussion-item">
+          <div class="discussion-header">
+            <div class="discussion-avatar" style="background:var(--primary-gradient)">SC</div><span
+              class="discussion-name">Dr. Sarah Chen</span><span class="badge badge-primary"
+              style="margin-left:var(--space-sm);font-size:9px">Instructor</span><span class="discussion-time"
+              style="margin-left:auto">1h ago</span>
+          </div>
+          <p class="discussion-text">@Maria Try using nvm (Node Version Manager) instead. It handles permissions
+            automatically. Run: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash</p>
+        </div>
+        <div class="discussion-item">
+          <div class="discussion-header">
+            <div class="discussion-avatar" style="background:var(--warm-gradient)">RL</div><span
+              class="discussion-name">Ryan Lee</span><span class="discussion-time" style="margin-left:auto">30m
+              ago</span>
+          </div>
+          <p class="discussion-text">Thanks! That worked perfectly for me.</p>
+        </div>
+        <div style="margin-top:var(--space-lg)">
+          <textarea class="form-control" placeholder="Add to the discussion..." rows="3"
+            style="margin-bottom:var(--space-sm)"></textarea>
+          <button class="btn btn-primary btn-sm ripple-effect" onclick="showToast('Comment posted!','success')">Post
+            Comment</button>
+        </div>
+      </div>
+
+      <!-- Quiz -->
+      <div class="right-panel-content" id="quiz" style="display:none">
+        <h5 style="margin-bottom:var(--space-lg)">Lesson Quiz</h5>
+        <div id="quizContainer">
+          <div style="text-align:center;padding:var(--space-xl)">
+            <div style="font-size:3rem;margin-bottom:var(--space-md)">❓</div>
+            <h5 style="margin-bottom:var(--space-sm)">Ready to test your knowledge?</h5>
+            <p style="color:var(--text-secondary);font-size:var(--font-sm);margin-bottom:var(--space-lg)">5 questions ·
+              10 minutes · 60% to pass</p>
+            <button class="btn btn-primary ripple-effect" onclick="loadQuiz(1)">Start Quiz</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/quiz.js"></script>
+  <script>
+    let currentCourse = null;
+    let currentLessons = [];
+    let userProgress = [];
+    let activeLessonId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      loadComponent('navbar-placeholder', 'components/navbar.html');
+      await loadLearningData();
+    });
+
+    async function loadLearningData() {
+      const params = new URLSearchParams(window.location.search);
+      const courseId = params.get('id');
+      if (!courseId) {
+        showToast('Course ID missing', 'error');
+        return;
+      }
+
+      try {
+        // Check auth
+        const token = localStorage.getItem('lms_token');
+        if (!token) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Fetch data in parallel
+        const [courseReq, lessonsReq, progressReq] = await Promise.allSettled([
+          apiRequest(`/courses/${courseId}`),
+          apiRequest(`/lessons?course_id=${courseId}`),
+          apiRequest(`/enrollments/progress/${courseId}`)
+        ]);
+
+        if (courseReq.status === 'fulfilled') {
+          currentCourse = courseReq.value;
+          // You could update page title here
+        }
+
+        if (lessonsReq.status === 'fulfilled') {
+          currentLessons = lessonsReq.value;
+        }
+
+        if (progressReq.status === 'fulfilled') {
+          userProgress = progressReq.value;
+        }
+
+        renderLessons();
+        updateProgressDisplay();
+
+        if (currentLessons.length > 0) {
+          // Find first uncompleted lesson or first lesson
+          let firstUncompleted = currentLessons.find(l => !isLessonCompleted(l.id));
+          selectLesson(firstUncompleted || currentLessons[0]);
+        }
+        // Load quizzes for this course into the right-panel quiz tab
+        try {
+          await loadCourseQuizzes(courseId);
+        } catch (e) {
+          console.warn('Failed to load course quizzes:', e);
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('lessonList').innerHTML = `<p style="color:var(--danger);text-align:center;padding:var(--space-md)">Failed to load course content.</p>`;
+      }
+    }
+
+    function isLessonCompleted(lessonId) {
+      const p = userProgress.find(p => p.lesson_id === lessonId);
+      return p && p.completed;
+    }
+
+    function updateProgressDisplay() {
+      if (!currentLessons.length) return;
+      const completedCount = currentLessons.filter(l => isLessonCompleted(l.id)).length;
+      const pct = Math.round((completedCount / currentLessons.length) * 100);
+
+      const progressInfo = document.getElementById('progressInfo');
+      progressInfo.innerHTML = `
+    <h3>📖 Course Content</h3>
+    <div class="progress-bar mt-md"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <p style="font-size:var(--font-xs);color:var(--text-muted);margin-top:var(--space-sm)">${pct}% complete · ${completedCount}/${currentLessons.length} lessons</p>
+  `;
+    }
+
+    function renderLessons() {
+      const list = document.getElementById('lessonList');
+      if (!currentLessons.length) {
+        list.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:var(--space-md)">No lessons published yet.</p>`;
+        return;
+      }
+
+      // We are not grouping by module for now, just rendering a flat list inside one accordion
+      list.innerHTML = `
+    <div class="module-accordion open">
+      <div class="module-header" onclick="this.parentElement.classList.toggle('open')">
+        <h4><span class="toggle-icon">▼</span> All Lessons</h4>
+      </div>
+      <div class="module-lessons">
+        ${currentLessons.map(l => {
+        const completed = isLessonCompleted(l.id);
+        let icon = '📋';
+        if (l.type === 'video') icon = '▶';
+        if (l.type === 'quiz') icon = '❓';
+        if (completed) icon = '✓';
+
+        return `
+            <div class="lesson-item ${activeLessonId === l.id ? 'active' : ''}" 
+                 id="lesson-nav-${l.id}"
+                 onclick="selectLessonById('${l.id}')"
+                 style="${activeLessonId === l.id ? 'background:rgba(108,92,231,0.1);border-left:3px solid var(--primary)' : ''}">
+              <span class="lesson-icon ${completed ? 'completed' : ''}" style="${!completed && activeLessonId !== l.id ? 'color:var(--text-muted)' : ''}">${icon}</span>
+              <span class="lesson-title">${l.title}</span>
+              <span class="lesson-duration">${l.duration || ''}</span>
+            </div>
+          `;
+      }).join('')}
+      </div>
+    </div>
+  `;
+    }
+
+    function selectLessonById(lessonId) {
+      const lesson = currentLessons.find(l => l.id === lessonId);
+      if (lesson) selectLesson(lesson);
+    }
+
+    function selectLesson(lesson) {
+      activeLessonId = lesson.id;
+      renderLessons(); // Re-render to update active styling
+
+      document.getElementById('lessonTitle').textContent = lesson.title;
+      document.getElementById('lessonDescription').textContent = lesson.description || '';
+
+      // Handle Video
+      const videoContainer = document.getElementById('videoContainer');
+      if (lesson.type === 'video' && lesson.video_url) {
+        // If it's a YouTube URL, convert to embed. Otherwise, try to use a <video> tag or iframe
+        let embedUrl = lesson.video_url;
+        if (embedUrl.includes('youtube.com/watch')) {
+          const videoId = new URL(embedUrl).searchParams.get('v');
+          embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        } else if (embedUrl.includes('youtu.be/')) {
+          const videoId = embedUrl.split('youtu.be/')[1].split('?')[0];
+          embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        }
+
+        if (embedUrl.includes('youtube.com/embed') || embedUrl.includes('vimeo.com')) {
+          videoContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameborder="0" allowfullscreen style="border-radius:var(--radius-lg)"></iframe>`;
+        } else {
+          // Direct video file
+          videoContainer.innerHTML = `<video controls src="${lesson.video_url}" width="100%" height="100%" style="border-radius:var(--radius-lg); background: black;"></video>`;
+        }
+      } else {
+        videoContainer.innerHTML = `
+      <div class="video-placeholder">
+        <div class="play-btn" style="background:var(--bg-glass);color:var(--text-muted)">${lesson.type === 'video' ? 'No video URL provided' : 'No video for this lesson'}</div>
+      </div>`;
+      }
+
+      // Show text content block if text lesson
+      const textContainer = document.getElementById('lessonTextContainer');
+      const textContent = document.getElementById('lessonTextContent');
+      if (lesson.type === 'text' && lesson.text_content) {
+        textContainer.style.display = 'block';
+        textContent.innerHTML = lesson.text_content; // Note: In a real app, sanitize this HTML
+      } else {
+        textContainer.style.display = 'none';
+      }
+
+      // Handle Mark Complete button
+      const markCompleteBtn = document.getElementById('markCompleteBtn');
+      markCompleteBtn.style.display = 'block';
+      if (isLessonCompleted(lesson.id)) {
+        markCompleteBtn.textContent = '✓ Completed';
+        markCompleteBtn.disabled = true;
+        markCompleteBtn.classList.remove('btn-primary');
+        markCompleteBtn.classList.add('btn-secondary');
+      } else {
+        markCompleteBtn.textContent = '✓ Mark Complete';
+        markCompleteBtn.disabled = false;
+        markCompleteBtn.classList.add('btn-primary');
+        markCompleteBtn.classList.remove('btn-secondary');
+      }
+
+      // Handle Resources
+      renderMaterials(lesson);
+    }
+
+    function renderMaterials(lesson) {
+      const materialsList = document.getElementById('materialsList');
+      let resources = lesson.resources;
+      if (typeof resources === 'string') {
+        try { resources = JSON.parse(resources); } catch (e) { resources = []; }
+      }
+
+      if (!resources || !resources.length) {
+        materialsList.innerHTML = `<p style="color:var(--text-muted);font-size:var(--font-sm)">No resources attached to this lesson.</p>`;
+        return;
+      }
+
+      // The resources array has { name, path, bucket, type }
+      // We need to fetch the public URL for each from Supabase
+      const SUPABASE_URL = localStorage.getItem('supabase_url') || 'http://localhost:54321'; // We might need to construct the URL directly or let the backend do it.
+      // We can just construct it manually if we know the project ref, but actually we have /api/storage/upload endpoint.
+      // Wait, Supabase public URLs are predictable: `https://${projectId}.supabase.co/storage/v1/object/public/${bucket}/${path}`
+      // Let's use the API we built or just fetch from the backend if possible.
+      // For now, let's just make them clickable and open the path directly if it's a full URL, or assume it's accessible.
+
+      // To get the public URL, we can use the backend, but since we don't have an endpoint for public URLs explicitly, 
+      // Let's assume the path is the URL if it starts with http, or we construct the Supabase URL.
+      // Actually, wait, the `course.js` or `storage.js` used to get public URLs. The `path` saved might be the full public URL from Supabase if we saved it that way in `storageController.js`.
+
+      materialsList.innerHTML = resources.map(res => {
+        let url = res.path;
+        if (res.bucket) {
+          // In LMS, we can use our own backend to get it, or assume `res.path` is the public URL.
+          // Usually `storageController.uploadFile` returns `{ path: publicUrl, ... }`. So `res.path` is likely the public URL.
+        }
+
+        return `
+      <a href="${url}" target="_blank" style="text-decoration:none; display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);background:var(--bg-glass);border-radius:var(--radius-md);cursor:pointer" class="hover-lift">
+        <span style="font-size:1.5rem">📄</span>
+        <div style="flex:1">
+          <p style="font-size:var(--font-sm);font-weight:500;color:var(--text-primary)">${res.name}</p>
+          <p style="font-size:var(--font-xs);color:var(--text-muted)">PDF Document</p>
+        </div>
+        <span style="color:var(--primary-light)">↗</span>
+      </a>
+    `;
+      }).join('');
+    }
+
+    async function markLessonComplete() {
+      if (!activeLessonId || !currentCourse) return;
+
+      const markCompleteBtn = document.getElementById('markCompleteBtn');
+      markCompleteBtn.disabled = true;
+      markCompleteBtn.textContent = 'Saving...';
+
+      try {
+        await apiRequest('/enrollments/progress', 'POST', {
+          lesson_id: activeLessonId,
+          course_id: currentCourse.id,
+          completed: true
+        });
+
+        showToast('Lesson marked as complete!', 'success');
+
+        // Update local state
+        const existing = userProgress.find(p => p.lesson_id === activeLessonId);
+        if (existing) {
+          existing.completed = true;
+        } else {
+          userProgress.push({ lesson_id: activeLessonId, course_id: currentCourse.id, completed: true });
+        }
+
+        updateProgressDisplay();
+        selectLessonById(activeLessonId); // re-render the lesson state
+      } catch (err) {
+        showToast('Failed to save progress', 'error');
+        markCompleteBtn.disabled = false;
+        markCompleteBtn.textContent = '✓ Mark Complete';
+      }
+    }
+
+    function switchRightTab(btn, panelId) {
+      document.querySelectorAll('.right-panel-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ['materials', 'discussion', 'quiz'].forEach(id => {
+        document.getElementById(id).style.display = id === panelId ? 'block' : 'none';
+      });
+    }
+
+    // Load and render quizzes for the current course into the quiz tab
+    async function loadCourseQuizzes(courseId) {
+      const quizContainer = document.getElementById('quizContainer');
+      if (!quizContainer) return;
+
+      quizContainer.innerHTML = '<div style="text-align:center;padding:var(--space-lg);color:var(--text-muted)">Loading quizzes...</div>';
+      try {
+        const allQuizzes = await apiRequest('/quizzes/enrolled');
+        const quizzes = (allQuizzes || []).filter(q => String(q.course_id) === String(courseId));
+        if (!quizzes || !quizzes.length) {
+          quizContainer.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:var(--space-md)">No quizzes available for this course.</p>';
+          return;
+        }
+
+        quizContainer.innerHTML = quizzes.map(q => {
+          const meta = q.passing_score ? `${q.time_limit || '—'} minutes · ${q.passing_score}% pass` : '';
+          const attempted = !!q.last_attempt;
+          const actionButton = attempted
+            ? `<a class="btn btn-secondary btn-sm" href="student/quiz-results.html?quiz=${q.id}">View Result</a>`
+            : `<a class="btn btn-primary btn-sm" href="student/quiz.html?quiz=${q.id}&course=${courseId}">Start Quiz</a>`;
+          return `
+        <div style="background:var(--bg-glass);border:1px solid var(--bg-glass-border);padding:12px;border-radius:10px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+          <div style="flex:1">
+            <h4 style="margin:0">${q.title}</h4>
+            <div style="color:var(--text-secondary);font-size:0.9rem">${q.description || ''}</div>
+            <div style="color:var(--text-muted);font-size:0.85rem;margin-top:6px">${meta}${q.last_attempt ? ` · ${q.last_attempt.passed ? 'Passed' : 'Attempted'}` : ''}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-left:12px">
+            ${actionButton}
+            <a class="btn btn-secondary btn-sm" href="student/quiz-results.html?quiz=${q.id}">Results</a>
+          </div>
+        </div>
+      `;
+        }).join('');
+      } catch (err) {
+        console.error('Error fetching quizzes:', err);
+        quizContainer.innerHTML = '<p style="color:var(--danger);text-align:center">Unable to load quizzes.</p>';
+      }
+    }
+  </script>
+</body>
+
+</html>

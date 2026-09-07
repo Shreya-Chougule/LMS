@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="LearnHub - Empowering learners worldwide with high-quality online education. Browse thousands of courses.">
+  <title>LearnHub — Online Learning Platform</title>
+
+  <!-- Redirect new visitors to login/signup -->
+  <script>
+    if (!localStorage.getItem('lms_token') || !localStorage.getItem('lms_user')) {
+      window.location.replace('./login.html');
+    }
+  </script>
+
+  <link rel="stylesheet" href="assets/css/global.css">
+  <link rel="stylesheet" href="assets/css/navbar.css">
+  <link rel="stylesheet" href="assets/css/course.css">
+  <style>
+    /* Hero */
+    .hero {
+      min-height: 92vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 0;
+    }
+
+    /* Decorative circles */
+    .hero-circles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-circle {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(37, 99, 235, 0.18);
+      animation: expandCircle 8s ease-in-out infinite;
+    }
+
+    .hero-circle:nth-child(1) {
+      width: 320px;
+      height: 320px;
+      top: 50%;
+      right: 8%;
+      transform: translate(0, -50%);
+      border-color: rgba(37, 99, 235, 0.22);
+      animation-delay: 0s;
+    }
+
+    .hero-circle:nth-child(2) {
+      width: 480px;
+      height: 480px;
+      top: 50%;
+      right: 8%;
+      transform: translate(0, -50%);
+      border-color: rgba(37, 99, 235, 0.14);
+      animation-delay: -2s;
+    }
+
+    .hero-circle:nth-child(3) {
+      width: 640px;
+      height: 640px;
+      top: 50%;
+      right: 8%;
+      transform: translate(0, -50%);
+      border-color: rgba(0, 206, 201, 0.1);
+      animation-delay: -4s;
+    }
+
+    .hero-circle:nth-child(4) {
+      width: 800px;
+      height: 800px;
+      top: 50%;
+      right: 8%;
+      transform: translate(0, -50%);
+      border-color: rgba(0, 206, 201, 0.06);
+      animation-delay: -6s;
+    }
+
+    /* Glowing dot on circle ring */
+    .hero-circle::before {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      top: 50%;
+      left: -4px;
+      box-shadow: 0 0 12px 4px rgba(37, 99, 235, 0.5);
+      animation: orbitDot 8s linear infinite;
+    }
+
+    .hero-circle:nth-child(2)::before {
+      background: var(--accent);
+      box-shadow: 0 0 12px 4px rgba(0, 206, 201, 0.5);
+      animation-duration: 12s;
+    }
+
+    .hero-circle:nth-child(3)::before {
+      display: none;
+    }
+
+    .hero-circle:nth-child(4)::before {
+      display: none;
+    }
+
+    /* Small floating dots */
+    .hero-dot {
+      position: absolute;
+      border-radius: 50%;
+      animation: floatDot ease-in-out infinite;
+    }
+
+    .hero-dot:nth-child(5) {
+      width: 10px;
+      height: 10px;
+      background: rgba(37, 99, 235, 0.5);
+      top: 18%;
+      right: 22%;
+      animation-duration: 5s;
+      animation-delay: 0s;
+    }
+
+    .hero-dot:nth-child(6) {
+      width: 6px;
+      height: 6px;
+      background: rgba(0, 206, 201, 0.6);
+      top: 72%;
+      right: 30%;
+      animation-duration: 7s;
+      animation-delay: -2s;
+    }
+
+    .hero-dot:nth-child(7) {
+      width: 8px;
+      height: 8px;
+      background: rgba(253, 121, 168, 0.5);
+      top: 35%;
+      right: 52%;
+      animation-duration: 6s;
+      animation-delay: -1s;
+    }
+
+    .hero-dot:nth-child(8) {
+      width: 5px;
+      height: 5px;
+      background: rgba(37, 99, 235, 0.4);
+      top: 60%;
+      right: 18%;
+      animation-duration: 9s;
+      animation-delay: -3s;
+    }
+
+    /* Arc / partial ring top-left */
+    .hero-arc {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(37, 99, 235, 0.15);
+      top: -80px;
+      left: -80px;
+      animation: spinSlow 30s linear infinite;
+      pointer-events: none;
+    }
+
+    .hero-arc::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      top: 50%;
+      right: -5px;
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.7);
+    }
+
+    @keyframes expandCircle {
+
+      0%,
+      100% {
+        opacity: 0.7;
+        transform: translate(0, -50%) scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: translate(0, -50%) scale(1.04);
+      }
+    }
+
+    @keyframes orbitDot {
+      from {
+        transform: translateY(-50%) rotate(0deg) translateX(0);
+      }
+
+      to {
+        transform: translateY(-50%) rotate(360deg) translateX(0);
+      }
+    }
+
+    @keyframes floatDot {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-14px);
+      }
+    }
+
+    @keyframes spinSlow {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hero-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3xl);
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-text h1 {
+      font-size: var(--font-5xl);
+      line-height: 1.1;
+      margin-bottom: var(--space-lg);
+      animation: fadeInUp .6s ease
+    }
+
+    .hero-text h1 .highlight {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .hero-text p {
+      font-size: var(--font-xl);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-xl);
+      max-width: 520px;
+      animation: fadeInUp .6s ease .1s both
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+      animation: fadeInUp .6s ease .2s both
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: var(--space-2xl);
+      margin-top: var(--space-2xl);
+      animation: fadeInUp .6s ease .3s both
+    }
+
+    .hero-stats .stat h3 {
+      font-size: var(--font-3xl);
+      font-weight: 800
+    }
+
+    .hero-stats .stat p {
+      color: var(--text-muted);
+      font-size: var(--font-sm)
+    }
+
+    .hero-visual {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: var(--space-md);
+      animation: fadeInRight .8s ease .2s both;
+      position: relative;
+      padding-top: var(--space-xl);
+    }
+
+    /* 3 floating cards */
+    .hero-float-card {
+      width: 190px;
+      flex-shrink: 0;
+      background: rgba(17, 31, 62, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+    }
+
+    .hero-float-card:nth-child(1) {
+      margin-top: 0px;
+      animation: floatCard1 6s ease-in-out infinite;
+    }
+
+    .hero-float-card:nth-child(2) {
+      margin-top: 40px;
+      animation: floatCard2 7s ease-in-out infinite;
+    }
+
+    .hero-float-card:nth-child(3) {
+      margin-top: 15px;
+      animation: floatCard3 8s ease-in-out infinite;
+    }
+
+    @keyframes floatCard1 {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    @keyframes floatCard2 {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes floatCard3 {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .hfc-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .hfc-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .hfc-title {
+      font-size: var(--font-sm);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .hfc-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .hfc-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .hfc-modules {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .hfc-module {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+
+    .hfc-module.active {
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      color: var(--primary-light);
+    }
+
+    /* Sections */
+    .section {
+      padding: var(--space-3xl) 0
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: var(--space-2xl)
+    }
+
+    /* Categories */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--space-lg)
+    }
+
+    .category-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      text-align: center;
+      transition: all var(--transition-normal);
+      cursor: pointer
+    }
+
+    .category-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow)
+    }
+
+    .category-card .cat-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-md)
+    }
+
+    .category-card h4 {
+      font-size: var(--font-md);
+      margin-bottom: var(--space-xs)
+    }
+
+    .category-card p {
+      font-size: var(--font-xs);
+      color: var(--text-muted)
+    }
+
+    /* About */
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-xl)
+    }
+
+    .about-card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--bg-glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      text-align: center;
+      transition: all var(--transition-normal)
+    }
+
+    .about-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md)
+    }
+
+    .about-card .about-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-md)
+    }
+
+    .about-card h4 {
+      margin-bottom: var(--space-sm)
+    }
+
+    .about-card p {
+      color: var(--text-secondary);
+      font-size: var(--font-sm);
+      line-height: 1.7
+    }
+
+    /* CTA */
+    .cta-section {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: var(--space-3xl) 0;
+      text-align: center
+    }
+
+    .cta-section h2 {
+      margin-bottom: var(--space-md)
+    }
+
+    .cta-section p {
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto var(--space-xl);
+      font-size: var(--font-lg)
+    }
+
+    /* Testimonials */
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg)
+    }
+
+    .testimonial-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl)
+    }
+
+    .testimonial-card .quote {
+      font-size: var(--font-md);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-lg);
+      font-style: italic
+    }
+
+    .testimonial-card .author {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md)
+    }
+
+    .testimonial-card .author-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white
+    }
+
+    .testimonial-card .author-info h5 {
+      font-size: var(--font-sm);
+      margin-bottom: 2px
+    }
+
+    .testimonial-card .author-info p {
+      font-size: var(--font-xs);
+      color: var(--text-muted)
+    }
+
+    /* Contact */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2xl);
+      align-items: start
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg)
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md)
+    }
+
+    .contact-item .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: rgba(108, 92, 231, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0
+    }
+
+    .contact-item h4 {
+      font-size: var(--font-md);
+      margin-bottom: 4px
+    }
+
+    .contact-item p {
+      font-size: var(--font-sm);
+      color: var(--text-secondary)
+    }
+
+    @media(max-width:1024px) {
+      .hero-content {
+        grid-template-columns: 1fr
+      }
+
+      .hero-visual {
+        display: none
+      }
+    }
+
+    @media(max-width:768px) {
+      .hero-text h1 {
+        font-size: var(--font-3xl)
+      }
+
+      .hero-stats {
+        gap: var(--space-lg)
+      }
+
+      .about-grid,
+      .testimonial-grid {
+        grid-template-columns: 1fr
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr
+      }
+
+      .categories-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-particles"></div>
+  <div class="bg-gradient-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <div id="navbar-placeholder">
+    <!-- LearnHub logo outside the navbar -->
+    <a href="./" class="navbar-brand-outside">
+      <span class="logo-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor"
+            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+      <span>Learn<span class="text-gradient">Hub</span></span>
+    </a>
+
+    <!-- Search card fixed top right -->
+    <div class="navbar-search-outside">
+      <div class="navbar-search">
+        <div class="search-card" id="searchCard">
+          <div class="search-card-line" id="searchLine"></div>
+          <input type="text" placeholder="Search courses..." id="navSearchInput" autocomplete="off">
+          <span class="search-card-label">Search</span>
+          <span class="search-card-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" />
+            </svg>
+          </span>
+        </div>
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+    </div>
+
+    <!-- Floating pill navbar -->
+    <nav class="navbar" id="mainNavbar">
+      <div class="navbar-inner">
+        <div class="navbar-links" id="navLinks">
+          <a href="./">Home</a>
+          <a href="./course-catalog.html">Courses</a>
+          <a href="./login.html">Instructor</a>
+        </div>
+        <div class="navbar-actions">
+          <button class="navbar-toggle" id="navToggle"><span></span><span></span><span></span></button>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <!-- Decorative circles -->
+    <div class="hero-circles">
+      <div class="hero-circle"></div>
+      <div class="hero-circle"></div>
+      <div class="hero-circle"></div>
+      <div class="hero-circle"></div>
+      <div class="hero-dot"></div>
+      <div class="hero-dot"></div>
+      <div class="hero-dot"></div>
+      <div class="hero-dot"></div>
+    </div>
+    <div class="hero-arc"></div>
+    <div class="container hero-content">
+      <div class="hero-text">
+        <h1>Learn Without <span class="highlight">Limits</span></h1>
+        <p>Join over 50,000 learners mastering new skills with expert-led courses. Start your journey today.</p>
+        <div class="hero-actions">
+          <a href="course-catalog.html" class="btn btn-primary btn-lg ripple-effect">Explore Courses →</a>
+          <a href="register.html" class="btn btn-secondary btn-lg">Get Started Free</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <h3 class="text-gradient">50K+</h3>
+            <p>Active Learners</p>
+          </div>
+          <div class="stat">
+            <h3 class="text-gradient">200+</h3>
+            <p>Expert Courses</p>
+          </div>
+          <div class="stat">
+            <h3 class="text-gradient">95%</h3>
+            <p>Satisfaction Rate</p>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <!-- Card 1: Web Dev -->
+        <div class="hero-float-card">
+          <div class="hfc-header">
+            <div class="hfc-avatar" style="background:var(--accent-gradient)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="4" width="20" height="13" rx="2" stroke="#fff" stroke-width="1.5" />
+                <line x1="8" y1="21" x2="16" y2="21" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="12" y2="21" stroke="#fff" stroke-width="1.5" />
+              </svg>
+            </div>
+            <div>
+              <div class="hfc-title">Web Dev Bootcamp</div>
+              <div class="hfc-sub">Dr. Sarah Chen</div>
+            </div>
+          </div>
+          <div class="hfc-progress-label"><span>Progress</span><span
+              style="color:var(--primary-light);font-weight:600">42%</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:42%"></div>
+          </div>
+          <div class="hfc-modules">
+            <div class="hfc-module"><span style="color:var(--success)">&#10003;</span> Course Introduction</div>
+            <div class="hfc-module"><span style="color:var(--success)">&#10003;</span> How the Web Works</div>
+            <div class="hfc-module active"><span>&#9654;</span> Setting Up Environment</div>
+          </div>
+        </div>
+
+        <!-- Card 2: Data Science -->
+        <div class="hero-float-card">
+          <div class="hfc-header">
+            <div class="hfc-avatar" style="background:var(--primary-gradient)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="14" width="4" height="8" rx="1" fill="#fff" opacity=".7" />
+                <rect x="10" y="8" width="4" height="14" rx="1" fill="#fff" opacity=".85" />
+                <rect x="17" y="3" width="4" height="19" rx="1" fill="#fff" />
+              </svg>
+            </div>
+            <div>
+              <div class="hfc-title">Python Data Science</div>
+              <div class="hfc-sub">Prof. James Miller</div>
+            </div>
+          </div>
+          <div class="hfc-progress-label"><span>Progress</span><span
+              style="color:var(--accent);font-weight:600">68%</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:68%;background:var(--accent-gradient)"></div>
+          </div>
+          <div class="hfc-modules">
+            <div class="hfc-module"><span style="color:var(--success)">&#10003;</span> Python Basics</div>
+            <div class="hfc-module active"><span>&#9654;</span> Data Wrangling</div>
+            <div class="hfc-module"><span style="color:var(--text-muted)">&#9675;</span> ML Fundamentals</div>
+          </div>
+        </div>
+
+        <!-- Card 3: UI/UX Design -->
+        <div class="hero-float-card">
+          <div class="hfc-header">
+            <div class="hfc-avatar" style="background:var(--warm-gradient)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01C12.88 19.26 12.73 18.91 12.73 18.5c0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-4.96-4.48-9-10-9z"
+                  stroke="#fff" stroke-width="1.5" fill="none" />
+                <circle cx="8" cy="11" r="1.2" fill="#fff" />
+                <circle cx="12" cy="7.5" r="1.2" fill="#fff" />
+                <circle cx="16" cy="11" r="1.2" fill="#fff" />
+              </svg>
+            </div>
+            <div>
+              <div class="hfc-title">UI/UX Design</div>
+              <div class="hfc-sub">Emily Rodriguez</div>
+            </div>
+          </div>
+          <div class="hfc-progress-label"><span>Progress</span><span
+              style="color:var(--warm);font-weight:600">25%</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:25%;background:var(--warm-gradient)"></div>
+          </div>
+          <div class="hfc-modules">
+            <div class="hfc-module"><span style="color:var(--success)">&#10003;</span> Design Principles</div>
+            <div class="hfc-module active"><span>&#9654;</span> Wireframing</div>
+            <div class="hfc-module"><span style="color:var(--text-muted)">&#9675;</span> Prototyping</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="section" id="categories">
+    <div class="container">
+      <div class="section-header" data-animate="fade-in-up">
+        <h2 class="section-title">Explore <span class="text-gradient">Categories</span></h2>
+        <p class="section-subtitle">Browse our wide range of subject areas and find the perfect course for you.</p>
+      </div>
+      <div class="categories-grid" id="categoriesGrid" data-animate="fade-in-up"></div>
+    </div>
+  </section>
+
+  <!-- Featured Courses -->
+  <section class="section" id="featured">
+    <div class="container">
+      <div class="section-header" data-animate="fade-in-up">
+        <h2 class="section-title">Featured <span class="text-gradient">Courses</span></h2>
+        <p class="section-subtitle">Handpicked courses to accelerate your career growth.</p>
+      </div>
+      <div class="course-grid" id="featuredCourses" data-animate="fade-in-up"></div>
+      <div class="text-center mt-xl" data-animate="fade-in-up">
+        <a href="course-catalog.html" class="btn btn-outline btn-lg">View All Courses →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="section-header" data-animate="fade-in-up">
+        <h2 class="section-title">Why <span class="text-gradient">LearnHub</span>?</h2>
+        <p class="section-subtitle">We're committed to delivering the best learning experience.</p>
+      </div>
+      <div class="about-grid" data-animate="fade-in-up">
+        <div class="about-card">
+          <div class="about-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none" />
+              <circle cx="12" cy="12" r="3" fill="currentColor" />
+              <line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="2" y1="12" x2="6" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="18" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg></div>
+          <h4>Expert Instructors</h4>
+          <p>Learn from industry professionals with real-world experience and proven track records.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 4V1L8 5l4 4V6a6 6 0 0 1 0 12v2a8 8 0 0 0 0-16z" fill="currentColor" />
+              <path d="M6 12a6 6 0 0 0 6 6v2a8 8 0 0 1 0-16v2a6 6 0 0 0-6 6z" fill="currentColor" opacity=".5" />
+            </svg></div>
+          <h4>Lifetime Access</h4>
+          <p>Enroll once and access course materials forever. Learn at your own pace with no deadlines.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"
+                fill="currentColor" />
+            </svg></div>
+          <h4>Certificates</h4>
+          <p>Earn recognized certificates upon course completion to showcase your skills.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header" data-animate="fade-in-up">
+        <h2 class="section-title">What Students <span class="text-gradient">Say</span></h2>
+        <p class="section-subtitle">Hear from our successful learners.</p>
+      </div>
+      <div class="testimonial-grid" data-animate="fade-in-up">
+        <div class="testimonial-card">
+          <p class="quote">"LearnHub transformed my career. The web development bootcamp was incredibly thorough and the
+            instructor support was phenomenal."</p>
+          <div class="author">
+            <div class="author-avatar" style="background:var(--primary-gradient)">JD</div>
+            <div class="author-info">
+              <h5>Jane Doe</h5>
+              <p>Software Developer</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="quote">"The data science course gave me the skills to land my dream job. The hands-on projects were
+            exactly what I needed."</p>
+          <div class="author">
+            <div class="author-avatar" style="background:var(--accent-gradient)">MK</div>
+            <div class="author-info">
+              <h5>Mike Kim</h5>
+              <p>Data Analyst</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <p class="quote">"Best investment I've ever made. The UI/UX design course helped me transition from graphic
+            design to product design."</p>
+          <div class="author">
+            <div class="author-avatar" style="background:var(--warm-gradient)">SR</div>
+            <div class="author-info">
+              <h5>Sara Rodriguez</h5>
+              <p>Product Designer</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" data-animate="fade-in-up">
+    <div class="container">
+      <h2>Start Your Learning Journey <span class="text-gradient">Today</span></h2>
+      <p>Join thousands of students already learning on LearnHub. Get unlimited access to all courses.</p>
+      <a href="register.html" class="btn btn-primary btn-lg ripple-effect">Get Started Free →</a>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="section-header" data-animate="fade-in-up">
+        <h2 class="section-title">Get In <span class="text-gradient">Touch</span></h2>
+        <p class="section-subtitle">Have questions? We'd love to hear from you.</p>
+      </div>
+      <div class="contact-grid" data-animate="fade-in-up">
+        <div class="contact-info">
+          <div class="contact-item">
+            <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.5" fill="none" />
+                <path d="M2 7l10 6 10-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" fill="none" />
+              </svg></div>
+            <div>
+              <h4>Email Us</h4>
+              <p>support@learnhub.com</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3.09 5.18 2 2 0 0 1 5.07 3h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.68 2.34a2 2 0 0 1-.45 2.11L8.91 10.6a16 16 0 0 0 6.49 6.49l1.43-1.39a2 2 0 0 1 2.11-.45c.74.32 1.53.55 2.34.68a2 2 0 0 1 1.72 2z"
+                  stroke="currentColor" stroke-width="1.5" fill="none" />
+              </svg></div>
+            <div>
+              <h4>Call Us</h4>
+              <p>+1 (555) 123-4567</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor"
+                  stroke-width="1.5" fill="none" />
+                <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.5" fill="none" />
+              </svg></div>
+            <div>
+              <h4>Visit Us</h4>
+              <p>123 Learning Street, San Francisco, CA 94102</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+                  stroke="currentColor" stroke-width="1.5" fill="none" />
+              </svg></div>
+            <div>
+              <h4>Live Chat</h4>
+              <p>Available Mon-Fri, 9am-6pm PST</p>
+            </div>
+          </div>
+        </div>
+        <form class="contact-form" onsubmit="event.preventDefault();showToast('Message sent successfully!','success')">
+          <div class="form-group"><label class="form-label">Name</label><input class="form-control"
+              placeholder="Your name" required></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-control" type="email"
+              placeholder="your@email.com" required></div>
+          <div class="form-group"><label class="form-label">Message</label><textarea class="form-control"
+              placeholder="How can we help?" rows="4" required></textarea></div>
+          <button type="submit" class="btn btn-primary btn-lg w-full ripple-effect">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+
+  <script>
+    window.LMS_API_BASE_URL = window.LMS_API_BASE_URL || 'http://localhost:5000/api';
+  </script>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/course.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Navbar init
+      const toggle = document.querySelector('.navbar-toggle');
+      const navLinks = document.querySelector('.navbar-links');
+      if (toggle && navLinks) {
+        toggle.addEventListener('click', () => { toggle.classList.toggle('active'); navLinks.classList.toggle('mobile-open'); });
+      }
+      const navbar = document.querySelector('.navbar');
+      if (navbar) window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 20));
+      // Active link
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.navbar-links a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && (href.endsWith(currentPage) || (currentPage === 'index.html' && href === './'))) link.classList.add('active');
+      });
+      // Search
+      const searchInput = document.getElementById('navSearchInput');
+      const searchDropdown = document.getElementById('searchDropdown');
+      const searchCard = document.getElementById('searchCard');
+      if (searchInput && searchDropdown && searchCard) {
+        searchInput.addEventListener('input', async () => {
+          const query = searchInput.value.trim();
+          if (query.length > 0) {
+            searchCard.classList.add('typing');
+            try {
+              const res = await fetch(`http://localhost:5000/api/courses?search=${encodeURIComponent(query)}&limit=5`);
+              const courses = await res.json();
+              searchDropdown.innerHTML = (!Array.isArray(courses) || courses.length === 0)
+                ? '<div class="search-empty">No courses found</div>'
+                : courses.map(c => `<a href="course-details.html?id=${c.id}" class="search-dropdown-item"><strong style="color:var(--text-primary)">${c.title}</strong><div style="font-size:10px;color:var(--text-muted)">${c.category || ''}</div></a>`).join('');
+              searchDropdown.classList.add('active');
+            } catch (e) {
+              searchDropdown.innerHTML = '<div class="search-empty">No courses found</div>';
+              searchDropdown.classList.add('active');
+            }
+          } else {
+            searchCard.classList.remove('typing');
+            searchDropdown.classList.remove('active');
+          }
+        });
+        document.addEventListener('click', (e) => {
+          if (!searchCard.contains(e.target)) { searchDropdown.classList.remove('active'); searchCard.classList.remove('typing'); }
+        });
+      }
+      loadComponent('footer-placeholder', 'components/footer.html');
+
+      // Render categories with real course counts
+      const catIcons = {
+        'Web Development': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="20" height="13" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="1.5"/></svg>',
+        'Data Science': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="14" width="4" height="8" rx="1" fill="currentColor" opacity=".6"/><rect x="10" y="8" width="4" height="14" rx="1" fill="currentColor" opacity=".8"/><rect x="17" y="3" width="4" height="19" rx="1" fill="currentColor"/></svg>',
+        'Design': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-1 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-4.96-4.48-9-10-9z" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="8" cy="11" r="1.5" fill="currentColor"/><circle cx="12" cy="7.5" r="1.5" fill="currentColor"/><circle cx="16" cy="11" r="1.5" fill="currentColor"/></svg>',
+        'Cloud Computing': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>',
+        'Mobile Development': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="2" width="10" height="20" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="7" y1="5" x2="17" y2="5" stroke="currentColor" stroke-width="1" opacity=".5"/><line x1="7" y1="19" x2="17" y2="19" stroke="currentColor" stroke-width="1" opacity=".5"/><circle cx="12" cy="20.5" r=".8" fill="currentColor"/></svg>',
+        'Cybersecurity': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/></svg>',
+        'Marketing': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><polyline points="17 6 23 6 23 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>',
+        'Blockchain': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="8" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="9" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="9" y="14" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="17" y="8" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="7" y1="10" x2="9" y2="8" stroke="currentColor" stroke-width="1.2"/><line x1="7" y1="12" x2="9" y2="16" stroke="currentColor" stroke-width="1.2"/><line x1="15" y1="8" x2="17" y2="10" stroke="currentColor" stroke-width="1.2"/><line x1="15" y1="16" x2="17" y2="12" stroke="currentColor" stroke-width="1.2"/></svg>',
+        'DevOps': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>',
+        'Business': '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="7" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="3" y1="13" x2="21" y2="13" stroke="currentColor" stroke-width="1" opacity=".4"/></svg>'
+      };
+
+      const grid = document.getElementById('categoriesGrid');
+      if (grid) {
+        // Fetch all courses to count per category
+        try {
+          const resp = await fetch(`${window.LMS_API_BASE_URL || 'http://localhost:5000/api'}/courses`);
+          const allCourses = await resp.json();
+          const counts = {};
+          (Array.isArray(allCourses) ? allCourses : []).forEach(c => {
+            if (c.category) counts[c.category] = (counts[c.category] || 0) + 1;
+          });
+
+          grid.innerHTML = Object.entries(catIcons).map(([name, icon]) =>
+            `<a href="course-catalog.html" class="category-card hover-lift"><div class="cat-icon">${icon}</div><h4>${name}</h4><p>${counts[name] || 0} Course${(counts[name] || 0) !== 1 ? 's' : ''}</p></a>`
+          ).join('');
+        } catch (e) {
+          // Fallback: show categories without counts
+          grid.innerHTML = Object.entries(catIcons).map(([name, icon]) =>
+            `<a href="course-catalog.html" class="category-card hover-lift"><div class="cat-icon">${icon}</div><h4>${name}</h4><p>Browse →</p></a>`
+          ).join('');
+        }
+        if (window.replaceEmojiIcons) window.replaceEmojiIcons(grid);
+      }
+
+      // Render featured courses
+      renderCourseCatalog('featuredCourses', { featured: true, limit: 6 });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create your LearnHub account and start learning today.">
+  <title>Register — LearnHub</title>
+  <link rel="stylesheet" href="assets/css/global.css">
+  <link rel="stylesheet" href="assets/css/forms.css">
+</head>
+
+<body>
+  <div class="bg-particles"></div>
+  <div class="bg-gradient-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <div class="auth-page">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <a href="./" class="auth-logo"><span class="logo-icon">📚</span><span>Learn<span
+                class="text-gradient">Hub</span></span></a>
+          <h2>Create Account</h2>
+          <p>Start your learning journey today</p>
+        </div>
+
+        <div class="social-login">
+          <button class="social-btn">🔵 Google</button>
+          <button class="social-btn">⬛ GitHub</button>
+        </div>
+        <div class="divider"><span>or register with email</span></div>
+
+        <form id="registerForm" onsubmit="return handleRegister(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" id="regFirstName" placeholder="John" required>
+              <span class="form-error">First name is required</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" id="regLastName" placeholder="Doe" required>
+              <span class="form-error">Last name is required</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <div class="input-group">
+              <input type="email" class="form-control" id="regEmail" placeholder="name@example.com" required>
+              <span class="input-icon">✉</span>
+            </div>
+            <span class="form-error">Valid email is required</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+              <input type="password" class="form-control" id="regPassword" placeholder="Create a strong password"
+                required oninput="updateStrength(this.value)">
+              <span class="input-icon">🔒</span>
+              <span class="toggle-password" onclick="togglePassword('regPassword', this)">👁</span>
+            </div>
+            <div class="password-strength">
+              <div class="strength-bar" id="strengthBar">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+              </div>
+              <span class="strength-text" id="strengthText"></span>
+            </div>
+            <span class="form-error">Password is required</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">I want to</label>
+            <select class="form-select" id="regRole" required>
+              <option value="">Select your role</option>
+              <option value="student">Learn (Student)</option>
+              <option value="instructor">Teach (Instructor)</option>
+              <option value="admin">Manage Platform (Admin)</option>
+            </select>
+          </div>
+
+          <div class="form-footer">
+            <label class="checkbox-group"><input type="checkbox" required> I agree to the <a href="#"
+                style="color:var(--primary-light)">Terms & Conditions</a></label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-full ripple-effect">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Already have an account? <a href="login.html">Sign in</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script>
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+      if (input.type === 'password') {
+        input.type = 'text';
+        el.innerHTML = getSvgIconMarkup('eyeOff');
+      } else {
+        input.type = 'password';
+        el.innerHTML = getSvgIconMarkup('eye');
+      }
+    }
+    function updateStrength(pw) {
+      const s = checkPasswordStrength(pw);
+      const bar = document.getElementById('strengthBar');
+      const text = document.getElementById('strengthText');
+      bar.className = 'strength-bar ' + s;
+      const labels = { weak: 'Weak password', medium: 'Fair password', strong: 'Strong password', 'very-strong': 'Very strong password' };
+      text.textContent = pw ? labels[s] : '';
+    }
+    async function handleRegister(e) {
+      e.preventDefault();
+      const form = document.getElementById('registerForm');
+
+      if (validateForm(form)) {
+        // Get form values
+        const firstName = document.getElementById('regFirstName').value;
+        const lastName = document.getElementById('regLastName').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+        const role = document.getElementById('regRole').value;
+
+        const name = `${firstName} ${lastName}`.trim();
+
+        try {
+          // Send request to backend
+          const response = await fetch('http://localhost:5000/api/auth/register', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password, name, role })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showToast('Account created successfully!', 'success');
+            setTimeout(() => window.location.href = 'login.html', 1500);
+          } else {
+            showToast(data.error || 'Registration failed', 'error');
+          }
+        } catch (error) {
+          console.error('Registration Error:', error);
+          showToast('Server connection error', 'error');
+        }
+      }
+      return false;
+    }
+  </script>
+</body>
+
+</html>

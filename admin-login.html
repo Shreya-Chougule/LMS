@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — LearnHub</title>
+  <link rel="stylesheet" href="assets/css/global.css">
+  <link rel="stylesheet" href="assets/css/forms.css">
+</head>
+<body>
+<div class="bg-particles"></div>
+<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <a href="./" class="auth-logo"><span class="logo-icon">📚</span><span>Learn<span class="text-gradient">Hub</span></span></a>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(225,112,85,0.12);border:1px solid rgba(225,112,85,0.3);border-radius:var(--radius-full);padding:4px 14px;margin-bottom:var(--space-sm)">
+          <span style="color:var(--danger);font-size:var(--font-xs);font-weight:600;text-transform:uppercase;letter-spacing:0.08em">🔒 Admin Access</span>
+        </div>
+        <h2>Admin Sign In</h2>
+        <p>Restricted to authorized administrators only</p>
+      </div>
+
+      <form id="adminLoginForm" onsubmit="return handleAdminLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Admin Email</label>
+          <div class="input-group">
+            <input type="email" class="form-control" id="adminEmail" placeholder="admin@learnhub.com" required>
+            <span class="input-icon">✉</span>
+          </div>
+          <span class="form-error">Please enter a valid email</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <input type="password" class="form-control" id="adminPassword" placeholder="Enter admin password" required>
+            <span class="input-icon">🔒</span>
+            <span class="toggle-password" onclick="togglePassword('adminPassword', this)">👁</span>
+          </div>
+          <span class="form-error">Password is required</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg w-full ripple-effect" style="background:linear-gradient(135deg,#E17055,#D63031);box-shadow:0 4px 15px rgba(225,112,85,0.4)">
+          Sign In to Admin Panel
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Not an admin? <a href="login.html">Go to regular login</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/main.js"></script>
+<script src="assets/js/api.js"></script>
+<script>
+function togglePassword(id, el) {
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  el.innerHTML = getSvgIconMarkup(input.type === 'password' ? 'eye' : 'eyeOff');
+}
+
+async function handleAdminLogin(e) {
+  e.preventDefault();
+  const form = document.getElementById('adminLoginForm');
+  if (!validateForm(form)) return false;
+
+  const email = document.getElementById('adminEmail').value;
+  const password = document.getElementById('adminPassword').value;
+
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      if (!data.user || data.user.role !== 'admin') {
+        showToast('Access denied. This login is for admins only.', 'error');
+        return false;
+      }
+      localStorage.setItem('lms_token', data.session.access_token);
+      localStorage.setItem('lms_user', JSON.stringify(data.user));
+      showToast('Welcome, Admin! Redirecting...', 'success');
+      setTimeout(() => window.location.href = 'admin/dashboard.html', 1500);
+    } else {
+      showToast(data.error || 'Invalid credentials', 'error');
+    }
+  } catch (error) {
+    showToast('Server connection error', 'error');
+  }
+  return false;
+}
+</script>
+</body>
+</html>

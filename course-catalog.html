@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browse all courses on LearnHub. Filter by category, level, and more.">
+  <title>Course Catalog — LearnHub</title>
+  <link rel="stylesheet" href="assets/css/global.css">
+  <link rel="stylesheet" href="assets/css/navbar.css">
+  <link rel="stylesheet" href="assets/css/course.css">
+  <style>
+    .catalog-page {
+      padding-top: calc(var(--navbar-height) + var(--space-2xl))
+    }
+
+    .catalog-header {
+      margin-bottom: var(--space-xl)
+    }
+
+    .catalog-header h1 {
+      font-size: var(--font-3xl);
+      margin-bottom: var(--space-sm)
+    }
+
+    .catalog-header p {
+      color: var(--text-secondary)
+    }
+
+    .catalog-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 400px
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
+      color: var(--text-primary);
+      font-size: var(--font-sm);
+      transition: all var(--transition-normal)
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15)
+    }
+
+    .search-box .icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted)
+    }
+
+    .filter-group {
+      display: flex;
+      gap: var(--space-sm)
+    }
+
+    .results-count {
+      color: var(--text-muted);
+      font-size: var(--font-sm);
+      margin-bottom: var(--space-lg)
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-particles"></div>
+  <div class="bg-gradient-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+  <!-- Inlined navbar to ensure visibility when opened locally -->
+  <!-- LearnHub logo outside the navbar -->
+  <a href="./" class="navbar-brand-outside">
+    <span class="logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor"
+          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </span>
+    <span>Learn<span class="text-gradient">Hub</span></span>
+  </a>
+
+  <!-- Search card fixed top right -->
+  <div class="navbar-search-outside">
+    <div class="navbar-search">
+      <div class="search-card" id="searchCard">
+        <div class="search-card-line" id="searchLine"></div>
+        <input type="text" placeholder="Search courses..." id="navSearchInput" autocomplete="off">
+        <span class="search-card-label" id="searchLabel">Search</span>
+        <span class="search-card-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </span>
+      </div>
+      <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
+  </div>
+
+  <!-- Floating pill navbar -->
+  <nav class="navbar" id="mainNavbar">
+    <div class="navbar-inner">
+      <div class="navbar-links" id="navLinks">
+        <a href="./">Home</a>
+        <a href="./course-catalog.html">Courses</a>
+        <a href="./instructor/dashboard.html">Instructor</a>
+      </div>
+      <div class="navbar-actions">
+        <button class="navbar-toggle" id="navToggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="catalog-page">
+    <div class="container">
+      <div class="catalog-header" data-animate="fade-in-up">
+        <h1>Course <span class="text-gradient">Catalog</span></h1>
+        <p>Discover courses that match your interests and career goals</p>
+      </div>
+
+      <div class="catalog-toolbar" data-animate="fade-in-up">
+        <div class="search-box">
+          <span class="icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search courses..." oninput="handleSearch()">
+        </div>
+        <div class="filter-group">
+          <select class="form-select" id="levelFilter" onchange="handleFilter()"
+            style="width:auto;padding:10px 36px 10px 14px;font-size:var(--font-sm);border-radius:var(--radius-full)">
+            <option value="">All Levels</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="categories-bar" id="categoryBar"></div>
+
+      <div id="resultsCount" class="results-count"></div>
+      <div class="course-grid" id="courseGrid"></div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/course.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadComponent('navbar-placeholder', 'components/navbar.html');
+      loadComponent('footer-placeholder', 'components/footer.html');
+      renderCategories('categoryBar');
+      renderCourseCatalog('courseGrid');
+    });
+
+    function handleSearch() {
+      const q = document.getElementById('searchInput').value;
+      const level = document.getElementById('levelFilter').value;
+      renderCourseCatalog('courseGrid', { search: q, level: level || undefined });
+    }
+    function handleFilter() { handleSearch(); }
+  </script>
+</body>
+
+</html>
