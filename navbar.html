@@ -1,0 +1,71 @@
+<!-- LearnHub logo outside the navbar -->
+<a href="./" class="navbar-brand-outside">
+  <span class="logo-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+        stroke-linejoin="round" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </span>
+  <span>Learn<span class="text-gradient">Hub</span></span>
+</a>
+
+<!-- Search card fixed top right -->
+<div class="navbar-search-outside">
+  <div class="navbar-search">
+    <div class="search-card" id="searchCard">
+      <div class="search-card-line" id="searchLine"></div>
+      <input type="text" placeholder="Search courses..." id="navSearchInput" autocomplete="off">
+      <span class="search-card-label" id="searchLabel">Search</span>
+      <span class="search-card-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </span>
+    </div>
+    <div class="search-dropdown" id="searchDropdown"></div>
+  </div>
+</div>
+
+<!-- Floating pill navbar -->
+<nav class="navbar" id="mainNavbar">
+  <div class="navbar-inner">
+    <div class="navbar-links" id="navLinks">
+      <a href="./">Home</a>
+      <a href="./course-catalog.html" id="navCoursesLink">Courses</a>
+      <a href="./student/dashboard.html" id="navDashboardLink">Dashboard</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="navbar-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<script>
+// Adjust navbar links based on user role
+(function() {
+  try {
+    const user = JSON.parse(localStorage.getItem('lms_user') || '{}');
+    const role = user.role;
+    const coursesLink = document.getElementById('navCoursesLink');
+    const dashLink = document.getElementById('navDashboardLink');
+
+    if (role === 'instructor') {
+      // Instructors don't need course catalog; link to their dashboard
+      if (coursesLink) coursesLink.style.display = 'none';
+      if (dashLink) { dashLink.href = './instructor/dashboard.html'; dashLink.textContent = 'Dashboard'; }
+    } else if (role === 'admin') {
+      if (coursesLink) coursesLink.style.display = 'none';
+      if (dashLink) { dashLink.href = './admin/dashboard.html'; dashLink.textContent = 'Dashboard'; }
+    } else if (role === 'guest') {
+      if (dashLink) { dashLink.href = './login.html'; dashLink.textContent = 'Sign In'; }
+    } else {
+      // Students see courses + their dashboard
+      if (dashLink) { dashLink.href = './student/dashboard.html'; dashLink.textContent = 'Dashboard'; }
+    }
+  } catch (e) {}
+})();
+</script>

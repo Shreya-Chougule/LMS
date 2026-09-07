@@ -1,0 +1,152 @@
+<style>
+  .footer-link {
+    color: var(--text-secondary);
+    font-size: var(--font-sm);
+    display: block;
+    padding: 3px 0;
+    transition: all 0.2s;
+  }
+  .footer-link:hover {
+    color: var(--primary-light);
+    padding-left: 6px;
+  }
+  .footer-col-title {
+    font-size: var(--font-md);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    display: inline-block;
+  }
+  @media (max-width: 768px) {
+    .footer-main-grid { grid-template-columns: 1fr 1fr !important; }
+    .footer-stats-grid { grid-template-columns: repeat(2,1fr) !important; }
+  }
+  @media (max-width: 480px) {
+    .footer-main-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+
+<footer class="footer">
+
+  <!-- Stats Bar -->
+  <div style="background:linear-gradient(135deg,rgba(37,99,235,0.12),rgba(0,206,201,0.08));border-bottom:1px solid var(--border-color);padding:var(--space-xl) 0">
+    <div class="container">
+      <div class="footer-stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-lg);text-align:center">
+        <div>
+          <div style="font-size:var(--font-3xl);font-weight:800;background:var(--primary-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">50K+</div>
+          <div style="font-size:var(--font-xs);color:var(--text-muted);margin-top:4px">Active Learners</div>
+        </div>
+        <div>
+          <div style="font-size:var(--font-3xl);font-weight:800;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">200+</div>
+          <div style="font-size:var(--font-xs);color:var(--text-muted);margin-top:4px">Expert Courses</div>
+        </div>
+        <div>
+          <div style="font-size:var(--font-3xl);font-weight:800;background:var(--warm-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">150+</div>
+          <div style="font-size:var(--font-xs);color:var(--text-muted);margin-top:4px">Top Instructors</div>
+        </div>
+        <div>
+          <div style="font-size:var(--font-3xl);font-weight:800;background:var(--primary-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">95%</div>
+          <div style="font-size:var(--font-xs);color:var(--text-muted);margin-top:4px">Satisfaction Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Footer -->
+  <div class="container" style="padding-top:var(--space-3xl);padding-bottom:var(--space-xl)">
+    <div class="footer-main-grid" style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:var(--space-2xl);margin-bottom:var(--space-3xl)">
+
+      <!-- Brand -->
+      <div>
+        <a href="./" class="navbar-logo" style="margin-bottom:var(--space-lg);display:inline-flex">
+          <span class="logo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span>Learn<span class="text-gradient">Hub</span></span>
+        </a>
+        <p style="color:var(--text-secondary);font-size:var(--font-sm);line-height:1.8;margin-bottom:var(--space-lg);max-width:300px">
+          Empowering learners worldwide with high-quality online education. Join thousands of students building real skills for real careers.
+        </p>
+
+        <!-- Newsletter -->
+        <div style="margin-bottom:var(--space-xl)">
+          <p style="font-size:var(--font-sm);font-weight:600;color:var(--text-primary);margin-bottom:var(--space-sm)">Subscribe to our newsletter</p>
+          <div style="display:flex;gap:var(--space-sm)">
+            <input type="email" placeholder="Enter your email" style="flex:1;padding:9px 14px;background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-md);color:var(--text-primary);font-size:var(--font-sm);font-family:inherit;outline:none">
+            <button onclick="showToast('Subscribed successfully!','success')" style="padding:9px 16px;background:var(--primary-gradient);border:none;border-radius:var(--radius-md);color:white;font-size:var(--font-sm);font-weight:600;cursor:pointer;white-space:nowrap">Subscribe</button>
+          </div>
+        </div>
+
+        <!-- Social -->
+        <div style="display:flex;gap:var(--space-sm)">
+          <a href="#" aria-label="Twitter" class="footer-social-icon" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-md);color:var(--text-secondary);transition:all 0.3s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="#" aria-label="Facebook" class="footer-social-icon" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-md);color:var(--text-secondary);transition:all 0.3s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="#" aria-label="LinkedIn" class="footer-social-icon" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-md);color:var(--text-secondary);transition:all 0.3s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="#" aria-label="YouTube" class="footer-social-icon" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-md);color:var(--text-secondary);transition:all 0.3s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="#" aria-label="Instagram" class="footer-social-icon" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-md);color:var(--text-secondary);transition:all 0.3s">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Platform -->
+      <div>
+        <h4 class="footer-col-title" style="border-bottom:2px solid var(--primary)">Platform</h4>
+        <div style="display:flex;flex-direction:column">
+          <a href="./course-catalog.html" class="footer-link">Browse Courses</a>
+          <a href="./register.html" class="footer-link">Become an Instructor</a>
+          <a href="#" class="footer-link">Enterprise Plans</a>
+          <a href="#" class="footer-link">Mobile App</a>
+          <a href="#" class="footer-link">Affiliate Program</a>
+          <a href="#" class="footer-link">Scholarships</a>
+        </div>
+      </div>
+
+      <!-- Company -->
+      <div>
+        <h4 class="footer-col-title" style="border-bottom:2px solid var(--warm)">Company</h4>
+        <div style="display:flex;flex-direction:column">
+          <a href="#" class="footer-link">About Us</a>
+          <a href="#" class="footer-link">Careers <span style="background:var(--accent-gradient);color:#0A0F1A;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:4px">Hiring</span></a>
+          <a href="#" class="footer-link">Press &amp; Media</a>
+          <a href="#" class="footer-link">Contact Us</a>
+          <a href="#" class="footer-link">Partners</a>
+          <a href="#" class="footer-link">Sitemap</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;justify-content:center;margin-bottom:var(--space-xl);padding:var(--space-lg);background:var(--bg-glass);border-radius:var(--radius-lg);border:1px solid var(--border-color)">
+      <div style="display:flex;align-items:center;gap:8px;font-size:var(--font-xs);color:var(--text-secondary)"><span style="color:var(--success)">&#10003;</span> SSL Secured</div>
+      <div style="width:1px;background:var(--border-color)"></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:var(--font-xs);color:var(--text-secondary)"><span style="color:var(--success)">&#10003;</span> 30-Day Money Back Guarantee</div>
+      <div style="width:1px;background:var(--border-color)"></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:var(--font-xs);color:var(--text-secondary)"><span style="color:var(--success)">&#10003;</span> Lifetime Access</div>
+      <div style="width:1px;background:var(--border-color)"></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:var(--font-xs);color:var(--text-secondary)"><span style="color:var(--success)">&#10003;</span> Certificate of Completion</div>
+      <div style="width:1px;background:var(--border-color)"></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:var(--font-xs);color:var(--text-secondary)"><span style="color:var(--success)">&#10003;</span> 24/7 Support</div>
+    </div>
+
+    <!-- Bottom -->
+    <div style="border-top:1px solid var(--border-color);padding-top:var(--space-lg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md)">
+      <p style="font-size:var(--font-xs);color:var(--text-muted)">&copy; 2026 LearnHub Inc. All rights reserved. Made with love for learners worldwide.</p>
+      <div style="display:flex;gap:var(--space-lg);flex-wrap:wrap">
+        <a href="#" class="footer-link" style="padding:0">Privacy Policy</a>
+        <a href="#" class="footer-link" style="padding:0">Terms of Service</a>
+        <a href="#" class="footer-link" style="padding:0">Cookie Policy</a>
+        <a href="#" class="footer-link" style="padding:0">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
