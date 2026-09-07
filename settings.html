@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — LearnHub Admin</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/forms.css">
+</head>
+<body>
+<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div id="sidebar-placeholder"></div>
+<div class="dashboard-content">
+  <div class="dashboard-header animate-fade-in-up">
+    <h1>Platform <span class="text-gradient">Settings</span></h1>
+    <p>Configure platform parameters and options</p>
+  </div>
+
+  <div class="tabs mb-xl" data-tab-content="settingsTabs">
+    <button class="tab-btn active" data-tab="generalTab">General</button>
+    <button class="tab-btn" data-tab="emailTab">Email</button>
+    <button class="tab-btn" data-tab="paymentTab">Payment</button>
+    <button class="tab-btn" data-tab="secTab">Security</button>
+  </div>
+
+  <div id="settingsTabs">
+    <div class="tab-content active" id="generalTab">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body">
+          <h4 style="margin-bottom:var(--space-lg)">Platform Configuration</h4>
+          <form onsubmit="event.preventDefault();showToast('Settings saved!','success')">
+            <div class="form-group"><label class="form-label">Platform Name</label><input class="form-control" value="LearnHub"></div>
+            <div class="form-group"><label class="form-label">Support Email</label><input class="form-control" type="email" value="support@learnhub.com"></div>
+            <div class="form-group"><label class="form-label">Time Zone</label>
+              <select class="form-select"><option>UTC-8 (Pacific)</option><option>UTC-5 (Eastern)</option><option selected>UTC+0 (GMT)</option><option>UTC+5:30 (IST)</option></select></div>
+            <div class="form-group"><label class="form-label">Default Language</label>
+              <select class="form-select"><option selected>English</option><option>Spanish</option><option>French</option><option>German</option></select></div>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md);background:var(--bg-glass);border-radius:var(--radius-md);margin-bottom:var(--space-md)"><div><p style="font-weight:500">Maintenance Mode</p><p style="font-size:var(--font-xs);color:var(--text-muted)">Temporarily disable the platform</p></div><input type="checkbox" style="accent-color:var(--primary);width:20px;height:20px"></label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md);background:var(--bg-glass);border-radius:var(--radius-md);margin-bottom:var(--space-lg)"><div><p style="font-weight:500">New Registrations</p><p style="font-size:var(--font-xs);color:var(--text-muted)">Allow new users to register</p></div><input type="checkbox" checked style="accent-color:var(--primary);width:20px;height:20px"></label>
+            <button type="submit" class="btn btn-primary ripple-effect">Save Settings</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="emailTab">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body">
+          <h4 style="margin-bottom:var(--space-lg)">Email Configuration</h4>
+          <form onsubmit="event.preventDefault();showToast('Email settings saved!','success')">
+            <div class="form-group"><label class="form-label">SMTP Host</label><input class="form-control" value="smtp.learnhub.com"></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">SMTP Port</label><input class="form-control" type="number" value="587"></div>
+              <div class="form-group"><label class="form-label">Encryption</label><select class="form-select"><option>TLS</option><option>SSL</option><option>None</option></select></div>
+            </div>
+            <div class="form-group"><label class="form-label">From Email</label><input class="form-control" value="noreply@learnhub.com"></div>
+            <div class="form-group"><label class="form-label">From Name</label><input class="form-control" value="LearnHub"></div>
+            <div style="display:flex;gap:var(--space-md)">
+              <button type="submit" class="btn btn-primary ripple-effect">Save</button>
+              <button type="button" class="btn btn-secondary" onclick="showToast('Test email sent!','success')">Send Test Email</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="paymentTab">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body">
+          <h4 style="margin-bottom:var(--space-lg)">Payment Gateway</h4>
+          <form onsubmit="event.preventDefault();showToast('Payment settings saved!','success')">
+            <div class="form-group"><label class="form-label">Payment Provider</label>
+              <select class="form-select"><option selected>Stripe</option><option>PayPal</option><option>Both</option></select></div>
+            <div class="form-group"><label class="form-label">API Key</label><input class="form-control" type="password" value="sk_live_xxxxxxxxxxxxx"></div>
+            <div class="form-group"><label class="form-label">Platform Commission (%)</label><input class="form-control" type="number" value="20" min="0" max="100"></div>
+            <div class="form-group"><label class="form-label">Currency</label>
+              <select class="form-select"><option selected>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option><option>INR (₹)</option></select></div>
+            <button type="submit" class="btn btn-primary ripple-effect">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="secTab">
+      <div class="dashboard-card">
+        <div class="dashboard-card-body">
+          <h4 style="margin-bottom:var(--space-lg)">Security Settings</h4>
+          <form onsubmit="event.preventDefault();showToast('Security settings saved!','success')">
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md);background:var(--bg-glass);border-radius:var(--radius-md);margin-bottom:var(--space-md)"><div><p style="font-weight:500">Two-Factor Authentication</p><p style="font-size:var(--font-xs);color:var(--text-muted)">Require 2FA for admin accounts</p></div><input type="checkbox" checked style="accent-color:var(--primary);width:20px;height:20px"></label>
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md);background:var(--bg-glass);border-radius:var(--radius-md);margin-bottom:var(--space-md)"><div><p style="font-weight:500">Auto-Lock Accounts</p><p style="font-size:var(--font-xs);color:var(--text-muted)">Lock after 5 failed login attempts</p></div><input type="checkbox" checked style="accent-color:var(--primary);width:20px;height:20px"></label>
+            <div class="form-group"><label class="form-label">Session Timeout (minutes)</label><input class="form-control" type="number" value="30" min="5"></div>
+            <div class="form-group"><label class="form-label">Minimum Password Length</label><input class="form-control" type="number" value="8" min="6"></div>
+            <button type="submit" class="btn btn-primary ripple-effect">Save Security Settings</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/js/auth-guard.js" data-role="admin"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/sidebar.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{loadComponent('sidebar-placeholder','../components/sidebar-admin.html')});</script>
+</body>
+</html>

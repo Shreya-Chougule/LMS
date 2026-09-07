@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enrollment Management — LearnHub Admin</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div id="sidebar-placeholder"></div>
+<div class="dashboard-content">
+  <div class="dashboard-header animate-fade-in-up">
+    <h1>Enrollment <span class="text-gradient">Management</span></h1>
+    <p>Track and manage course enrollments</p>
+  </div>
+
+  <div class="stats-grid mb-xl">
+    <div class="stat-card"><div class="stat-value">32,800</div><div class="stat-label">Total Enrollments</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--success)">28,400</div><div class="stat-label">Active</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent)">3,200</div><div class="stat-label">Completed</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--danger)">1,200</div><div class="stat-label">Dropped</div></div>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="dashboard-card-header"><h3>Recent Enrollments</h3></div>
+    <div class="dashboard-card-body">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Student</th><th>Course</th><th>Enrolled</th><th>Progress</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Alex Johnson</strong></td><td>Web Dev Bootcamp</td><td>Sep 20, 2025</td><td><div style="display:flex;align-items:center;gap:var(--space-sm)"><div class="progress-bar" style="width:100px"><div class="progress-fill" style="width:42%"></div></div><span style="font-size:var(--font-xs)">42%</span></div></td><td><span class="badge badge-success">Active</span></td><td><button class="btn btn-secondary btn-sm" onclick="showToast('Enrollment details','info')">View</button></td></tr>
+            <tr><td><strong>Maria Garcia</strong></td><td>UI/UX Design</td><td>Nov 5, 2025</td><td><div style="display:flex;align-items:center;gap:var(--space-sm)"><div class="progress-bar" style="width:100px"><div class="progress-fill" style="width:28%"></div></div><span style="font-size:var(--font-xs)">28%</span></div></td><td><span class="badge badge-success">Active</span></td><td><button class="btn btn-secondary btn-sm" onclick="showToast('Enrollment details','info')">View</button></td></tr>
+            <tr><td><strong>Ryan Lee</strong></td><td>Advanced React</td><td>Jan 15, 2026</td><td><div style="display:flex;align-items:center;gap:var(--space-sm)"><div class="progress-bar" style="width:100px"><div class="progress-fill" style="width:12%"></div></div><span style="font-size:var(--font-xs)">12%</span></div></td><td><span class="badge badge-success">Active</span></td><td><button class="btn btn-secondary btn-sm" onclick="showToast('Enrollment details','info')">View</button></td></tr>
+            <tr><td><strong>Alex Johnson</strong></td><td>Digital Marketing</td><td>Aug 10, 2025</td><td><div style="display:flex;align-items:center;gap:var(--space-sm)"><div class="progress-bar" style="width:100px"><div class="progress-fill" style="width:100%;background:var(--accent-gradient)"></div></div><span style="font-size:var(--font-xs)">100%</span></div></td><td><span class="badge badge-accent">Completed</span></td><td><button class="btn btn-secondary btn-sm" onclick="showToast('Enrollment details','info')">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/js/auth-guard.js" data-role="admin"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/sidebar.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>{loadComponent('sidebar-placeholder','../components/sidebar-admin.html')});</script>
+</body>
+</html>

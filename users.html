@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management — LearnHub Admin</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/forms.css">
+</head>
+
+<body>
+  <div class="bg-gradient-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+  <div id="sidebar-placeholder"></div>
+  <div class="dashboard-content">
+    <div class="dashboard-header animate-fade-in-up"
+      style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:var(--space-md)">
+      <div>
+        <h1>User <span class="text-gradient">Management</span></h1>
+        <p>View, suspend, and activate platform users</p>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:var(--space-md);margin-bottom:var(--space-xl);flex-wrap:wrap">
+      <input class="form-control" style="max-width:300px" placeholder="Search users...">
+      <select class="form-select" style="width:auto;padding:10px 36px 10px 14px">
+        <option>All Roles</option>
+        <option>Student</option>
+        <option>Instructor</option>
+        <option>Admin</option>
+      </select>
+      <select class="form-select" style="width:auto;padding:10px 36px 10px 14px">
+        <option>All Status</option>
+        <option>Active</option>
+        <option>Inactive</option>
+        <option>Suspended</option>
+      </select>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="dashboard-card-body">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTbody">
+              <tr>
+                <td colspan="6" style="text-align:center;color:var(--text-muted);padding:var(--space-xl)">Loading
+                  users...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- Reports Section -->
+    <div class="dashboard-card" style="margin-top:var(--space-xl)">
+      <div class="dashboard-card-header">
+        <h3>🚩 User Reports</h3>
+        <button class="btn btn-secondary btn-sm" onclick="loadReports()">Refresh</button>
+      </div>
+      <div class="dashboard-card-body">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Reported User</th>
+                <th>Reported By</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reportsTbody">
+              <tr>
+                <td colspan="6" style="text-align:center;color:var(--text-muted);padding:var(--space-xl)">Loading
+                  reports...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal-overlay" id="userDetailsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>User Details</h3><button class="modal-close" data-modal-close="userDetailsModal">✕</button>
+      </div>
+      <div class="modal-body" id="userDetailsBody"></div>
+    </div>
+  </div>
+
+  <script src="../assets/js/auth-guard.js" data-role="admin"></script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/sidebar.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script>
+    let usersCache = [];
+    const isAccountInactive = (value) => value === false || value === 'false' || value === 0 || value === '0' || value === null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadComponent('sidebar-placeholder', '../components/sidebar-admin.html');
+      initModals();
+      loadUsers();
+      loadReports();
+    });
+
+    async function loadUsers() {
+      const tbody = document.getElementById('usersTbody');
+      try {
+        const response = await apiRequest('/admin/users?limit=100');
+        usersCache = response.users || [];
+
+        if (!usersCache.length) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:var(--space-xl)">No users found.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = usersCache.map(user => {
+          const name = user.name || user.email || 'Unknown User';
+          const initials = name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase() || 'U';
+          const role = (user.role || 'student').toLowerCase();
+          const joined = user.created_at ? new Date(user.created_at).toLocaleDateString() : '—';
+          const isActive = !isAccountInactive(user.is_active);
+          const statusLabel = isActive ? 'Active' : 'Suspended';
+          const avatarUrl = user.avatar_url;
+          const avatarMarkup = avatarUrl
+            ? `<img src="${avatarUrl}" alt="${name} avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(255,255,255,0.12)" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div style="width:36px;height:36px;border-radius:50%;background:var(--primary-gradient);display:none;align-items:center;justify-content:center;font-size:var(--font-xs);font-weight:700;color:white">${initials}</div>`
+            : `<div style="width:36px;height:36px;border-radius:50%;background:var(--primary-gradient);display:flex;align-items:center;justify-content:center;font-size:var(--font-xs);font-weight:700;color:white">${initials}</div>`;
+          const actionButton = isActive
+            ? `<button class="btn btn-danger btn-sm" onclick="toggleUserStatus('${user.id}', false)">Suspend</button>`
+            : `<button class="btn btn-primary btn-sm" onclick="toggleUserStatus('${user.id}', true)">Activate</button>`;
+
+          return `<tr>
+        <td><div style="display:flex;align-items:center;gap:var(--space-md)">${avatarMarkup}<strong>${name}</strong></div></td>
+        <td>${user.email || '—'}</td>
+        <td><span class="badge ${role === 'instructor' ? 'badge-accent' : role === 'admin' ? 'badge-warning' : 'badge-primary'}">${role.charAt(0).toUpperCase() + role.slice(1)}</span></td>
+        <td style="color:var(--text-muted)">${joined}</td>
+        <td><span class="badge ${isActive ? 'badge-success' : 'badge-warning'}">${statusLabel}</span></td>
+        <td style="display:flex;gap:var(--space-sm)">
+          <button class="btn btn-secondary btn-sm" onclick="viewUser('${user.id}')">View</button>
+          ${actionButton}
+        </td>
+      </tr>`;
+        }).join('');
+      } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:var(--space-xl)">Failed to load users.</td></tr>';
+      }
+    }
+
+    function viewUser(userId) {
+      const user = usersCache.find(item => item.id === userId);
+      if (!user) return;
+
+      const isActive = !isAccountInactive(user.is_active);
+      const detailsBody = document.getElementById('userDetailsBody');
+      detailsBody.innerHTML = `
+    <div style="display:grid;gap:var(--space-lg);text-align:left">
+      <div style="display:flex;justify-content:center">
+        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="${user.name || 'User'} avatar" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.14);box-shadow:0 12px 28px rgba(0,0,0,0.18)" onerror="this.style.display='none'">` : '<div style="width:96px;height:96px;border-radius:50%;background:var(--primary-gradient);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--font-xl);color:white;box-shadow:0 12px 28px rgba(0,0,0,0.18)">U</div>'}
+      </div>
+      <div><strong>Name:</strong> ${user.name || '—'}</div>
+      <div><strong>Email:</strong> ${user.email || '—'}</div>
+      <div><strong>Role:</strong> ${(user.role || 'student').toUpperCase()}</div>
+      <div><strong>Status:</strong> ${isActive ? 'Active' : 'Suspended'}</div>
+      <div><strong>Joined:</strong> ${user.created_at ? new Date(user.created_at).toLocaleString() : '—'}</div>
+    </div>`;
+      openModal('userDetailsModal');
+    }
+
+    async function toggleUserStatus(userId, nextState) {
+      try {
+        await apiRequest(`/admin/users/${userId}`, 'PUT', { is_active: nextState });
+        showToast(nextState ? 'User activated!' : 'User suspended!', nextState ? 'success' : 'warning');
+        loadUsers();
+      } catch (error) {
+        showToast(error.message || 'Failed to update user', 'error');
+      }
+    }
+
+    async function loadReports() {
+      const tbody = document.getElementById('reportsTbody');
+      try {
+        const reports = await apiRequest('/reports');
+        if (!reports.length) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:var(--space-xl)">No reports yet.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = reports.map(r => {
+          const reportedName = r.reported?.name || r.reported_user_id;
+          const reporterName = r.reporter?.name || 'Unknown';
+          const date = new Date(r.created_at).toLocaleDateString();
+          const statusBadge = r.status === 'pending'
+            ? '<span class="badge badge-warning">Pending</span>'
+            : r.status === 'resolved'
+              ? '<span class="badge badge-success">Resolved</span>'
+              : '<span class="badge badge-accent">Dismissed</span>';
+          const avatarUrl = r.reported?.avatar_url;
+          const preview = avatarUrl
+            ? `<img src="${avatarUrl}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border-color)" alt="avatar">`
+            : '<div style="width:36px;height:36px;border-radius:50%;background:var(--bg-glass);display:flex;align-items:center;justify-content:center;font-size:var(--font-xs);color:var(--text-muted)">N/A</div>';
+          return `<tr>
+        <td><div style="display:flex;align-items:center;gap:var(--space-sm)">${preview}<span>${reportedName}</span></div></td>
+        <td style="color:var(--text-muted)">${reporterName}</td>
+        <td>${r.reason.replace(/_/g, ' ')}</td>
+        <td>${statusBadge}</td>
+        <td style="color:var(--text-muted);font-size:var(--font-xs)">${date}</td>
+        <td style="display:flex;gap:var(--space-sm)">
+          ${r.status === 'pending' ? `
+            <button class="btn btn-success btn-sm" onclick="resolveReport('${r.id}', 'resolved')">Resolve</button>
+            <button class="btn btn-secondary btn-sm" onclick="resolveReport('${r.id}', 'dismissed')">Dismiss</button>
+          ` : '—'}
+        </td>
+      </tr>`;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:var(--space-xl)">Failed to load reports.</td></tr>';
+      }
+    }
+
+    async function resolveReport(id, status) {
+      try {
+        await apiRequest(`/reports/${id}`, 'PUT', { status });
+        showToast(`Report ${status}!`, 'success');
+        loadReports();
+      } catch (err) {
+        showToast(err.message || 'Failed to update report', 'error');
+      }
+    }
+  </script>
+</body>
+
+</html>

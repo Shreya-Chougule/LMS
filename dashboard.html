@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+
+<body>
+  <div class="bg-gradient-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+  <div id="sidebar-placeholder"></div>
+  <div class="dashboard-content">
+    <div class="dashboard-header animate-fade-in-up">
+      <h1>Admin <span class="text-gradient">Dashboard</span></h1>
+      <p>Platform overview and management</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(108,92,231,0.15);color:var(--primary-light)">👥</div>
+        <div class="stat-value" id="stat-total-users">—</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-change" id="stat-users-change"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(0,206,201,0.15);color:var(--accent)">📖</div>
+        <div class="stat-value" id="stat-total-courses">—</div>
+        <div class="stat-label">Active Courses</div>
+        <div class="stat-change" id="stat-courses-change"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(0,184,148,0.15);color:var(--success)">💰</div>
+        <div class="stat-value" id="stat-total-revenue">—</div>
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-change" id="stat-revenue-change"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(253,203,110,0.15);color:var(--warning)">📋</div>
+        <div class="stat-value" id="stat-total-enrollments">—</div>
+        <div class="stat-label">Enrollments</div>
+        <div class="stat-change" id="stat-enrollments-change"></div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h3>Quick Actions</h3>
+        </div>
+        <div class="dashboard-card-body">
+          <div class="quick-access-grid">
+            <a href="users.html" class="quick-access-item"><span class="qa-icon">👥</span><span>Manage Users</span></a>
+            <a href="courses.html" class="quick-access-item"><span class="qa-icon">📖</span><span>Manage
+                Courses</span></a>
+            <a href="enrollments.html" class="quick-access-item"><span
+                class="qa-icon">📋</span><span>Enrollments</span></a>
+            <a href="reports.html" class="quick-access-item"><span class="qa-icon">📊</span><span>View
+                Reports</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h3>Recent Activity</h3>
+        </div>
+        <div class="dashboard-card-body">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(0,184,148,0.15);color:var(--success)">✓</div>
+              <div class="activity-info">
+                <h4>New course published: "Blockchain Fundamentals"</h4>
+                <p>By David Park · 1 hour ago</p>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(108,92,231,0.15);color:var(--primary-light)">👤</div>
+              <div class="activity-info">
+                <h4>New instructor registration: Jennifer Brooks</h4>
+                <p>Pending approval · 3 hours ago</p>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(253,203,110,0.15);color:var(--warning)">⚠</div>
+              <div class="activity-info">
+                <h4>System backup completed</h4>
+                <p>Automated · Today 3:00 AM</p>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(225,112,85,0.15);color:var(--danger)">🚩</div>
+              <div class="activity-info">
+                <h4>Course review flagged for inappropriate content</h4>
+                <p>Web Dev Bootcamp · Yesterday</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-card" style="grid-column:1/-1">
+        <div class="dashboard-card-header">
+          <h3>Platform Overview</h3>
+        </div>
+        <div class="dashboard-card-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space-lg)">
+            <div
+              style="background:var(--bg-glass);border-radius:var(--radius-md);padding:var(--space-lg);text-align:center">
+              <p style="font-size:var(--font-xs);color:var(--text-muted);margin-bottom:var(--space-sm)">Students</p>
+              <p style="font-size:var(--font-2xl);font-weight:800" id="overview-students">—</p>
+            </div>
+            <div
+              style="background:var(--bg-glass);border-radius:var(--radius-md);padding:var(--space-lg);text-align:center">
+              <p style="font-size:var(--font-xs);color:var(--text-muted);margin-bottom:var(--space-sm)">Instructors</p>
+              <p style="font-size:var(--font-2xl);font-weight:800" id="overview-instructors">—</p>
+            </div>
+            <div
+              style="background:var(--bg-glass);border-radius:var(--radius-md);padding:var(--space-lg);text-align:center">
+              <p style="font-size:var(--font-xs);color:var(--text-muted);margin-bottom:var(--space-sm)">Admins</p>
+              <p style="font-size:var(--font-2xl);font-weight:800" id="overview-admins">—</p>
+            </div>
+            <div
+              style="background:var(--bg-glass);border-radius:var(--radius-md);padding:var(--space-lg);text-align:center">
+              <p style="font-size:var(--font-xs);color:var(--text-muted);margin-bottom:var(--space-sm)">Avg Completion
+              </p>
+              <p style="font-size:var(--font-2xl);font-weight:800" id="overview-completion">—</p>
+            </div>
+            <div
+              style="background:var(--bg-glass);border-radius:var(--radius-md);padding:var(--space-lg);text-align:center">
+              <p style="font-size:var(--font-xs);color:var(--text-muted);margin-bottom:var(--space-sm)">Avg Rating</p>
+              <p style="font-size:var(--font-2xl);font-weight:800;color:var(--warning)" id="overview-rating">—</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../assets/js/auth-guard.js" data-role="admin"></script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/sidebar.js"></script>
+  <script>document.addEventListener('DOMContentLoaded', () => { loadComponent('sidebar-placeholder', '../components/sidebar-admin.html') });</script>
+  <script>
+    async function loadAdminStats() {
+      try {
+        const token = localStorage.getItem('lms_token');
+        const res = await fetch('http://localhost:5000/api/admin/stats', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        if (!res.ok) throw new Error('Failed to fetch stats');
+        const data = await res.json();
+
+        document.getElementById('stat-total-users').textContent = data.totalUsers ?? '0';
+        document.getElementById('stat-total-courses').textContent = data.totalCourses ?? '0';
+        document.getElementById('stat-total-enrollments').textContent = data.totalEnrollments ?? '0';
+        // revenue/changes not provided by API — show N/A
+        document.getElementById('stat-total-revenue').textContent = 'N/A';
+
+        document.getElementById('overview-students').textContent = data.totalStudents ?? '0';
+        document.getElementById('overview-instructors').textContent = data.totalInstructors ?? '0';
+        document.getElementById('overview-admins').textContent = data.totalAdmins ?? '0';
+        document.getElementById('overview-completion').textContent = 'N/A';
+        document.getElementById('overview-rating').textContent = 'N/A';
+
+      } catch (e) {
+        console.error('Admin stats load error', e);
+        if (window.showToast) showToast('Unable to load admin stats', 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAdminStats);
+  </script>
+</body>
+
+</html>
