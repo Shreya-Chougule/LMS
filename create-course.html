@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Course — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/forms.css">
+  <link rel="stylesheet" href="../assets/css/navbar.css">
+</head>
+
+<body>
+  <div class="bg-gradient-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+  <div id="sidebar-placeholder"></div>
+  <div class="dashboard-content">
+    <div class="dashboard-header animate-fade-in-up">
+      <h1>Create <span class="text-gradient">Course</span></h1>
+      <p>Fill in the details to create a new course</p>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="dashboard-card-body">
+        <form id="createCourseForm" onsubmit="handleCreateCourse(event)">
+          <div class="form-group">
+            <label class="form-label">Course Title *</label>
+            <input id="courseTitle" class="form-control" placeholder="e.g., Complete Python Masterclass" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select id="courseCategory" class="form-select" required>
+                <option value="">Select category</option>
+                <option>Web Development</option>
+                <option>Data Science</option>
+                <option>Design</option>
+                <option>Cloud Computing</option>
+                <option>Mobile Development</option>
+                <option>Cybersecurity</option>
+                <option>Marketing</option>
+                <option>Business</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Level *</label>
+              <select id="courseLevel" class="form-select" required>
+                <option value="">Select level</option>
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Course Description *</label>
+            <textarea id="courseDescription" class="form-control" rows="5" placeholder="Provide a detailed description..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Course Duration</label>
+            <input id="courseDuration" class="form-control" placeholder="e.g., 12 hours">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Price (₹) *</label>
+              <input id="coursePrice" class="form-control" type="number" min="0" step="0.01" placeholder="999" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Original Price (₹)</label>
+              <input id="courseOriginalPrice" class="form-control" type="number" min="0" step="0.01" placeholder="1999">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Thumbnail URL</label>
+            <input id="courseThumbnail" class="form-control" placeholder="https://...">
+          </div>
+          <div style="display:flex;gap:var(--space-md);justify-content:flex-end;margin-top:var(--space-lg)">
+            <a href="manage-courses.html" class="btn btn-secondary">Cancel</a>
+            <button type="submit" id="submitBtn" class="btn btn-primary ripple-effect">Publish Course</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/auth-guard.js" data-role="instructor"></script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadComponent('sidebar-placeholder', '../components/sidebar-instructor.html');
+    });
+
+    async function handleCreateCourse(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Publishing...';
+
+      const payload = {
+        title: document.getElementById('courseTitle').value.trim(),
+        category: document.getElementById('courseCategory').value,
+        level: document.getElementById('courseLevel').value,
+        description: document.getElementById('courseDescription').value.trim(),
+        duration: document.getElementById('courseDuration').value.trim(),
+        price: parseFloat(document.getElementById('coursePrice').value) || 0,
+        original_price: parseFloat(document.getElementById('courseOriginalPrice').value) || 0,
+        thumbnail_url: document.getElementById('courseThumbnail').value.trim() || null,
+      };
+
+      try {
+        await apiRequest('/courses', 'POST', payload);
+        showToast('Course created successfully!', 'success');
+        setTimeout(() => window.location.href = 'manage-courses.html', 1500);
+      } catch (err) {
+        showToast(err.message || 'Failed to create course', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Publish Course';
+      }
+    }
+  </script>
+</body>
+
+</html>

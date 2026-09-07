@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Quiz — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/forms.css">
+</head>
+<body>
+<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div id="sidebar-placeholder"></div>
+<div class="dashboard-content">
+  <div class="dashboard-header animate-fade-in-up">
+    <h1>Create <span class="text-gradient">Quiz</span></h1>
+    <p>Build a quiz for your course</p>
+  </div>
+
+  <div class="dashboard-card mb-xl">
+    <div class="dashboard-card-body">
+      <form id="quizForm" onsubmit="handleCreateQuiz(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Course *</label>
+            <select class="form-select" id="course-select" required>
+              <option value="">Loading courses...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Module</label>
+            <select class="form-select" id="module-select">
+              <option value="">Select a course first</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Quiz Title *</label><input id="quiz-title" class="form-control" placeholder="e.g., HTML Fundamentals Quiz" required></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Time Limit (minutes)</label><input id="quiz-time" class="form-control" type="number" value="10" min="1"></div>
+          <div class="form-group"><label class="form-label">Passing Score (%)</label><input id="quiz-passing" class="form-control" type="number" value="60" min="1" max="100"></div>
+        </div>
+
+        <div style="border-top:1px solid var(--border-color);padding-top:var(--space-xl);margin-top:var(--space-xl)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
+            <h4>Questions</h4>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="addQuestion()">+ Add Question</button>
+          </div>
+          <div id="questionsContainer">
+            <!-- Question 1 -->
+            <div class="question-block" style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:var(--space-lg);margin-bottom:var(--space-lg)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md)">
+                <h5>Question 1</h5>
+                <button type="button" class="btn btn-icon btn-sm" style="color:var(--danger)" onclick="this.closest('.question-block').remove()">✕</button>
+              </div>
+              <div class="form-group"><label class="form-label">Question Text *</label><input class="form-control q-text" placeholder="Enter your question..." required></div>
+              <div class="form-group"><label class="form-label">Option A *</label><input class="form-control q-opt" placeholder="First option" required></div>
+              <div class="form-group"><label class="form-label">Option B *</label><input class="form-control q-opt" placeholder="Second option" required></div>
+              <div class="form-group"><label class="form-label">Option C</label><input class="form-control q-opt" placeholder="Third option"></div>
+              <div class="form-group"><label class="form-label">Option D</label><input class="form-control q-opt" placeholder="Fourth option"></div>
+              <div class="form-group"><label class="form-label">Correct Answer *</label>
+                <select class="form-select q-correct" required><option value="0">Option A</option><option value="1">Option B</option><option value="2">Option C</option><option value="3">Option D</option></select></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:var(--space-md);justify-content:flex-end">
+          <button type="button" class="btn btn-secondary" onclick="showToast('Quiz saved as draft!','info')">Save Draft</button>
+          <button type="submit" id="submitBtn" class="btn btn-primary ripple-effect">Publish Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="../assets/js/auth-guard.js" data-role="instructor"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/sidebar.js"></script>
+<script src="../assets/js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  loadComponent('sidebar-placeholder', '../components/sidebar-instructor.html');
+  loadInstructorCourses();
+});
+
+async function loadInstructorCourses() {
+  const user = JSON.parse(localStorage.getItem('lms_user') || '{}');
+  if (!user.id) return;
+  const select = document.getElementById('course-select');
+  try {
+    const courses = await apiRequest(`/courses?instructor_id=${user.id}`);
+    if (!courses.length) {
+      select.innerHTML = '<option value="">No courses found — create one first</option>';
+      return;
+    }
+    select.innerHTML = '<option value="">Select course</option>';
+    courses.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.title;
+      select.appendChild(opt);
+    });
+    select.addEventListener('change', () => {
+      if (select.value) loadModules(select.value);
+      else document.getElementById('module-select').innerHTML = '<option value="">Select a course first</option>';
+    });
+  } catch (e) {
+    select.innerHTML = '<option value="">Failed to load courses</option>';
+  }
+}
+
+async function loadModules(courseId) {
+  const modSelect = document.getElementById('module-select');
+  modSelect.innerHTML = '<option value="">No module (standalone)</option>';
+  try {
+    const modules = await apiRequest(`/courses/${courseId}/modules`);
+    modules.forEach(mod => {
+      const opt = document.createElement('option');
+      opt.value = mod.id;
+      opt.textContent = mod.title;
+      modSelect.appendChild(opt);
+    });
+  } catch (e) {
+    console.warn('Could not load modules:', e);
+  }
+}
+
+let qCount = 1;
+function addQuestion() {
+  qCount++;
+  const html = `<div class="question-block" style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:var(--space-lg);margin-bottom:var(--space-lg);animation:fadeInUp 0.3s ease">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md)"><h5>Question ${qCount}</h5><button type="button" class="btn btn-icon btn-sm" style="color:var(--danger)" onclick="this.closest('.question-block').remove()">✕</button></div>
+    <div class="form-group"><label class="form-label">Question Text *</label><input class="form-control q-text" placeholder="Enter your question..." required></div>
+    <div class="form-group"><label class="form-label">Option A *</label><input class="form-control q-opt" placeholder="First option" required></div>
+    <div class="form-group"><label class="form-label">Option B *</label><input class="form-control q-opt" placeholder="Second option" required></div>
+    <div class="form-group"><label class="form-label">Option C</label><input class="form-control q-opt" placeholder="Third option"></div>
+    <div class="form-group"><label class="form-label">Option D</label><input class="form-control q-opt" placeholder="Fourth option"></div>
+    <div class="form-group"><label class="form-label">Correct Answer *</label><select class="form-select q-correct" required><option value="0">Option A</option><option value="1">Option B</option><option value="2">Option C</option><option value="3">Option D</option></select></div>
+  </div>`;
+  document.getElementById('questionsContainer').insertAdjacentHTML('beforeend', html);
+}
+
+async function handleCreateQuiz(e) {
+  e.preventDefault();
+  const courseId = document.getElementById('course-select').value;
+  if (!courseId) { showToast('Please select a course', 'error'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Publishing...';
+
+  try {
+    // 1. Create the quiz
+    const quiz = await apiRequest('/quizzes', 'POST', {
+      course_id: courseId,
+      title: document.getElementById('quiz-title').value.trim(),
+      time_limit: parseInt(document.getElementById('quiz-time').value) || null,
+      passing_score: parseInt(document.getElementById('quiz-passing').value) || 60
+    });
+
+    // 2. Collect questions
+    const blocks = document.querySelectorAll('.question-block');
+    const questions = Array.from(blocks).map(block => {
+      const opts = Array.from(block.querySelectorAll('.q-opt')).map(i => i.value.trim()).filter(Boolean);
+      const correctIndex = parseInt(block.querySelector('.q-correct').value);
+      return {
+        question_text: block.querySelector('.q-text').value.trim(),
+        options: opts,
+        correct_answer: opts[correctIndex] || opts[0],
+        points: 1
+      };
+    });
+
+    if (questions.length) {
+      await apiRequest(`/quizzes/${quiz.quiz.id}/questions`, 'POST', { questions });
+    }
+
+    showToast('Quiz published successfully!', 'success');
+    document.getElementById('quizForm').reset();
+    document.getElementById('questionsContainer').innerHTML = '';
+    qCount = 0;
+    addQuestion();
+  } catch (err) {
+    showToast(err.message || 'Failed to publish quiz', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Publish Quiz';
+  }
+}
+</script>
+</body>
+</html>

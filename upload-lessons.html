@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Lessons — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/forms.css">
+</head>
+<body>
+<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div id="sidebar-placeholder"></div>
+<div class="dashboard-content">
+  <div class="dashboard-header animate-fade-in-up">
+    <h1>Upload <span class="text-gradient">Lessons</span></h1>
+    <p>Add video lessons, resources, and content to your courses</p>
+  </div>
+
+  <div class="dashboard-card mb-xl">
+    <div class="dashboard-card-body">
+      <form id="lessonForm" onsubmit="handleCreateLesson(event)">
+
+        <!-- Course Select -->
+        <div class="form-group">
+          <label class="form-label">Select Course *</label>
+          <select class="form-select" id="course-select" required>
+            <option value="">Choose a course</option>
+          </select>
+        </div>
+
+        <!-- Module Select -->
+        <div class="form-group">
+          <label class="form-label">Module</label>
+          <select class="form-select" id="module-select" onchange="handleModuleSelectChange()">
+            <option value="">No module (standalone lesson)</option>
+          </select>
+          <p style="font-size:var(--font-xs);color:var(--text-muted);margin-top:4px">
+            Modules are loaded from the selected course. Leave blank for a standalone lesson.
+          </p>
+          <!-- Inline new module creator -->
+          <div id="new-module-box" style="display:none;margin-top:var(--space-sm);display:none;gap:var(--space-sm);align-items:center">
+            <input id="new-module-title" class="form-control" placeholder="Module name e.g. API Basics" style="flex:1">
+            <button type="button" class="btn btn-primary btn-sm" onclick="submitNewModule()">Create</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="cancelNewModule()">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Lesson Title -->
+        <div class="form-group">
+          <label class="form-label">Lesson Title *</label>
+          <input id="lesson-title" class="form-control" placeholder="e.g., Introduction to Variables" required>
+        </div>
+
+        <!-- Lesson Type & Duration -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Lesson Type *</label>
+            <select class="form-select" id="lesson-type" required>
+              <option value="video">Video Lesson</option>
+              <option value="text">Text Content</option>
+              <option value="quiz">Quiz</option>
+              <option value="assignment">Assignment</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration</label>
+            <input id="lesson-duration" class="form-control" placeholder="e.g., 12:30">
+          </div>
+        </div>
+
+        <!-- Video Section -->
+        <div class="form-group" id="video-section">
+          <label class="form-label">Video URL *</label>
+          <input type="url" id="video-url" class="form-control" placeholder="e.g. https://youtube.com/watch?v=... or direct .mp4 link" required>
+          <p style="font-size:var(--font-xs);color:var(--text-muted);margin-top:4px">YouTube, Google Drive, or any direct video URL.</p>
+        </div>
+
+        <!-- Lesson Description -->
+        <div class="form-group">
+          <label class="form-label">Lesson Description</label>
+          <textarea id="lesson-description" class="form-control" rows="4" placeholder="Describe what this lesson covers..."></textarea>
+        </div>
+
+        <!-- Downloadable Resources -->
+        <div class="form-group">
+          <label class="form-label">Downloadable Resources</label>
+          <p style="font-size:var(--font-xs);color:var(--text-muted);margin-bottom:var(--space-sm)">
+            Upload PDFs that students can download.
+          </p>
+
+          <div class="input-mode-toggle">
+            <button type="button" class="input-mode-btn active" onclick="switchResourceMode('upload')">Upload Files</button>
+            <button type="button" class="input-mode-btn" onclick="switchResourceMode('url')">Paste URLs</button>
+          </div>
+
+          <!-- Upload mode -->
+          <div id="resource-upload-container"></div>
+
+          <!-- URL mode -->
+          <div id="resource-url-container" style="display:none">
+            <div id="resource-url-list" style="display:flex;flex-direction:column;gap:var(--space-sm)"></div>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top:var(--space-sm)" onclick="addResourceUrlRow()">+ Add Resource Link</button>
+          </div>
+        </div>
+
+        <!-- Preview checkbox -->
+        <div class="form-group">
+          <label class="checkbox-group"><input type="checkbox" id="lesson-preview"> Make this a preview (free) lesson</label>
+        </div>
+
+        <!-- Sort order -->
+        <div class="form-group">
+          <label class="form-label">Sort Order</label>
+          <input id="lesson-sort" class="form-control" type="number" min="0" value="0" placeholder="0" style="max-width:120px">
+          <p style="font-size:var(--font-xs);color:var(--text-muted);margin-top:4px">Lower numbers appear first in the lesson list.</p>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex;gap:var(--space-md);justify-content:flex-end;margin-top:var(--space-lg)">
+          <a href="manage-courses.html" class="btn btn-secondary">Cancel</a>
+          <button type="submit" id="submitBtn" class="btn btn-primary ripple-effect">Publish Lesson</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/auth-guard.js" data-role="instructor"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/sidebar.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/storage.js"></script>
+<script>
+  let resourceUploadWidget = null;
+  let currentResourceMode = 'upload';
+
+  // ---- Init ----
+  document.addEventListener('DOMContentLoaded', () => {
+    loadComponent('sidebar-placeholder', '../components/sidebar-instructor.html');
+    loadInstructorCourses();
+  });
+
+  // ---- Load instructor's courses ----
+  async function loadInstructorCourses() {
+    const user = JSON.parse(localStorage.getItem('lms_user') || '{}');
+    if (!user.id) return;
+
+    try {
+      const courses = await apiRequest(`/courses?instructor_id=${user.id}`);
+      const select = document.getElementById('course-select');
+      if (!courses.length) {
+        select.innerHTML = '<option value="">No courses found — create one first</option>';
+        return;
+      }
+      courses.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.title;
+        select.appendChild(opt);
+      });
+
+      // When course changes, load modules and init upload widgets
+      select.addEventListener('change', () => {
+        const courseId = select.value;
+        if (courseId) {
+          loadModules(courseId);
+          initUploadWidgets(courseId);
+        }
+      });
+    } catch (e) {
+      document.getElementById('course-select').innerHTML = '<option value="">Failed to load courses</option>';
+    }
+  }
+
+  // ---- Load modules for a course ----
+  async function loadModules(courseId) {
+    const modSelect = document.getElementById('module-select');
+    modSelect.innerHTML = '<option value="">No module (standalone lesson)</option>';
+    // Hide the new module box whenever course changes
+    document.getElementById('new-module-box').style.display = 'none';
+
+    try {
+      const modules = await apiRequest(`/courses/${courseId}/modules`);
+      modules.forEach(mod => {
+        const opt = document.createElement('option');
+        opt.value = mod.id;
+        opt.textContent = mod.title;
+        modSelect.appendChild(opt);
+      });
+    } catch (e) {
+      console.warn('Could not load modules:', e);
+    }
+
+    // Always append the "create new" sentinel option at the bottom
+    const createOpt = document.createElement('option');
+    createOpt.value = '__create__';
+    createOpt.textContent = '\u2795 Create new module...';
+    modSelect.appendChild(createOpt);
+  }
+
+  // ---- Handle module dropdown change ----
+  function handleModuleSelectChange() {
+    const val = document.getElementById('module-select').value;
+    const box = document.getElementById('new-module-box');
+    if (val === '__create__') {
+      box.style.display = 'flex';
+      document.getElementById('new-module-title').focus();
+    } else {
+      box.style.display = 'none';
+    }
+  }
+
+  // ---- Create new module inline ----
+  async function submitNewModule() {
+    const courseId = document.getElementById('course-select').value;
+    const title = document.getElementById('new-module-title').value.trim();
+
+    if (!title) {
+      showToast('Please enter a module name', 'error');
+      return;
+    }
+
+    try {
+      const result = await apiRequest(`/courses/${courseId}/modules`, 'POST', { title });
+      const newMod = result.module;
+
+      // Insert the new option before the "create new" sentinel
+      const modSelect = document.getElementById('module-select');
+      const createOpt = modSelect.querySelector('option[value="__create__"]');
+      const opt = document.createElement('option');
+      opt.value = newMod.id;
+      opt.textContent = newMod.title;
+      modSelect.insertBefore(opt, createOpt);
+
+      // Auto-select the newly created module
+      modSelect.value = newMod.id;
+
+      // Hide the input box and clear it
+      document.getElementById('new-module-box').style.display = 'none';
+      document.getElementById('new-module-title').value = '';
+
+      showToast(`Module "${newMod.title}" created!`, 'success');
+    } catch (err) {
+      showToast(err.message || 'Failed to create module', 'error');
+    }
+  }
+
+  // ---- Cancel new module creation ----
+  function cancelNewModule() {
+    const modSelect = document.getElementById('module-select');
+    modSelect.value = '';
+    document.getElementById('new-module-box').style.display = 'none';
+    document.getElementById('new-module-title').value = '';
+  }
+
+  // ---- Init upload widgets (needs courseId) ----
+  function initUploadWidgets(courseId) {
+    // Resource upload widget
+    resourceUploadWidget = createFileUploadWidget({
+      container: document.getElementById('resource-upload-container'),
+      bucket: 'course-pdfs',
+      courseId,
+      multiple: true,
+      onUploaded: (result) => {
+        showToast(`${result.originalName} uploaded!`, 'success');
+      }
+    });
+  }
+
+  // ---- Toggle resource input mode ----
+  function switchResourceMode(mode) {
+    currentResourceMode = mode;
+    const toggleContainer = document.querySelectorAll('.input-mode-toggle')[1];
+    const btns = toggleContainer.querySelectorAll('.input-mode-btn');
+    btns.forEach(b => b.classList.remove('active'));
+    btns[mode === 'upload' ? 0 : 1].classList.add('active');
+
+    document.getElementById('resource-upload-container').style.display = mode === 'upload' ? '' : 'none';
+    document.getElementById('resource-url-container').style.display = mode === 'url' ? '' : 'none';
+  }
+
+  // ---- Add a resource URL row ----
+  function addResourceUrlRow() {
+    const list = document.getElementById('resource-url-list');
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:var(--space-sm);align-items:center';
+    row.innerHTML = `
+      <input type="text" class="form-control resource-name" placeholder="Resource name" style="flex:0.4">
+      <input type="url" class="form-control resource-url" placeholder="https://... (PDF, ZIP, Drive link)" style="flex:1">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="this.parentElement.remove()">✕</button>`;
+    list.appendChild(row);
+  }
+
+  // ---- Collect resources from both modes ----
+  function collectResources() {
+    const resources = [];
+
+    // Uploaded files
+    if (currentResourceMode === 'upload' && resourceUploadWidget) {
+      resourceUploadWidget.getUploadedFiles().forEach(f => {
+        resources.push({
+          name: f.originalName,
+          path: f.path,
+          bucket: f.bucket,
+          type: f.mimeType,
+          size: f.size,
+          source: 'upload'
+        });
+      });
+    }
+
+    // URL resources
+    if (currentResourceMode === 'url') {
+      document.querySelectorAll('#resource-url-list > div').forEach(row => {
+        const name = row.querySelector('.resource-name').value.trim();
+        const url = row.querySelector('.resource-url').value.trim();
+        if (url) {
+          resources.push({
+            name: name || url.split('/').pop() || 'Resource',
+            url,
+            source: 'url'
+          });
+        }
+      });
+    }
+
+    return resources;
+  }
+
+  // ---- Submit lesson ----
+  async function handleCreateLesson(e) {
+    e.preventDefault();
+
+    const courseId = document.getElementById('course-select').value;
+    if (!courseId) {
+      showToast('Please select a course first', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Publishing...';
+
+    // Determine video source
+    let videoUrl = document.getElementById('video-url').value.trim() || null;
+    const lessonType = document.getElementById('lesson-type').value;
+
+    // For video lessons, require a URL
+    if (lessonType === 'video' && !videoUrl) {
+      showToast('Please paste a video URL', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Publish Lesson';
+      return;
+    }
+
+    const payload = {
+      course_id: courseId,
+      module_id: (() => { const v = document.getElementById('module-select').value; return (v && v !== '__create__') ? v : null; })(),
+      title: document.getElementById('lesson-title').value.trim(),
+      type: lessonType,
+      description: document.getElementById('lesson-description').value.trim() || null,
+      video_url: videoUrl,
+      video_path: null,
+      resources: collectResources(),
+      duration: document.getElementById('lesson-duration').value.trim() || null,
+      is_preview: document.getElementById('lesson-preview').checked,
+      sort_order: parseInt(document.getElementById('lesson-sort').value) || 0
+    };
+
+    try {
+      await apiRequest('/lessons', 'POST', payload);
+      showToast('Lesson created successfully!', 'success');
+
+      // Reset form
+      document.getElementById('lessonForm').reset();
+      if (resourceUploadWidget) resourceUploadWidget.clear();
+      document.getElementById('resource-url-list').innerHTML = '';
+
+    } catch (err) {
+      showToast(err.message || 'Failed to create lesson', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Publish Lesson';
+    }
+  }
+</script>
+</body>
+</html>

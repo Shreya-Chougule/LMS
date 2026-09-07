@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics — LearnHub</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <style>
+    .chart-placeholder{background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--radius-lg);padding:var(--space-2xl);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:250px}
+    .bar-chart{display:flex;align-items:flex-end;gap:var(--space-md);height:180px;padding-top:var(--space-lg)}
+    .bar-chart .bar{width:40px;border-radius:var(--radius-sm) var(--radius-sm) 0 0;transition:height 1s ease;position:relative}
+    .bar-chart .bar span{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);font-size:var(--font-xs);color:var(--text-muted);white-space:nowrap}
+    .bar-chart .bar .bar-value{position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:var(--font-xs);font-weight:600}
+  </style>
+</head>
+<body>
+<div class="bg-gradient-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div id="sidebar-placeholder"></div>
+<div class="dashboard-content">
+  <div class="dashboard-header animate-fade-in-up">
+    <h1>Course <span class="text-gradient">Analytics</span></h1>
+    <p>Track your course performance and student engagement</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(108,92,231,0.15);color:var(--primary-light)">📈</div><div class="stat-value" id="stat-total-students">—</div><div class="stat-label">Total Students</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(0,206,201,0.15);color:var(--accent)">💰</div><div class="stat-value" id="stat-total-revenue">—</div><div class="stat-label">Total Revenue</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(253,203,110,0.15);color:var(--warning)">📊</div><div class="stat-value" id="stat-courses">—</div><div class="stat-label">Total Courses</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(253,121,168,0.15);color:var(--warm)">⭐</div><div class="stat-value" id="stat-avg-rating">—</div><div class="stat-label">Avg Rating</div></div>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Enrollment Chart -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header"><h3>Monthly Enrollments</h3></div>
+      <div class="dashboard-card-body">
+        <div class="bar-chart" id="enrollmentChart" style="justify-content:center">
+          <p style="color:var(--text-muted);font-size:var(--font-sm)">Loading...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue Breakdown -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header"><h3>Revenue Breakdown</h3></div>
+      <div class="dashboard-card-body">
+        <div id="revenueBreakdown" style="display:flex;flex-direction:column;gap:var(--space-lg)">
+          <p style="color:var(--text-muted);font-size:var(--font-sm)">Loading...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Students -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header"><h3>Top Students</h3></div>
+      <div class="dashboard-card-body">
+        <div class="activity-list" id="topStudentsList">
+          <p style="color:var(--text-muted);font-size:var(--font-sm)">Loading...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Reviews -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header"><h3>Recent Reviews</h3></div>
+      <div class="dashboard-card-body">
+        <div class="activity-list">
+          <div class="activity-item" style="flex-direction:column;align-items:flex-start">
+            <div style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:var(--space-sm)"><span style="color:var(--warning)">★★★★★</span><span style="font-size:var(--font-xs);color:var(--text-muted)">2 hours ago</span></div>
+            <p style="font-size:var(--font-sm);color:var(--text-secondary)">"The best web development course I've ever taken. Clear explanations and great projects!" — <strong>Jason S.</strong></p>
+          </div>
+          <div class="activity-item" style="flex-direction:column;align-items:flex-start">
+            <div style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:var(--space-sm)"><span style="color:var(--warning)">★★★★☆</span><span style="font-size:var(--font-xs);color:var(--text-muted)">Yesterday</span></div>
+            <p style="font-size:var(--font-sm);color:var(--text-secondary)">"Great content overall. Would love more advanced React patterns covered." — <strong>Amy C.</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../assets/js/auth-guard.js" data-role="instructor"></script>
+<script src="../assets/js/main.js"></script>
+<script src="../assets/js/sidebar.js"></script>
+<script src="../assets/js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  loadComponent('sidebar-placeholder', '../components/sidebar-instructor.html');
+
+  const user = JSON.parse(localStorage.getItem('lms_user') || '{}');
+  if (!user.id) return;
+
+  // Load stats + revenue breakdown from courses
+  apiRequest(`/courses?instructor_id=${user.id}`).then(courses => {
+    let totalStudents = 0, totalRevenue = 0, ratingSum = 0, ratingCount = 0;
+    courses.forEach(c => {
+      totalStudents += (c.enrolled_count || 0);
+      totalRevenue += (c.price || 0) * (c.enrolled_count || 0);
+      if (c.rating) { ratingSum += c.rating; ratingCount++; }
+    });
+    document.getElementById('stat-total-students').textContent =
+      totalStudents >= 1000 ? (totalStudents / 1000).toFixed(1) + 'K' : totalStudents;
+    document.getElementById('stat-total-revenue').textContent = '\u20b9' +
+      (totalRevenue >= 1000 ? (totalRevenue / 1000).toFixed(1) + 'K' : totalRevenue);
+    document.getElementById('stat-courses').textContent = courses.length;
+    document.getElementById('stat-avg-rating').textContent =
+      ratingCount > 0 ? (ratingSum / ratingCount).toFixed(1) : 'N/A';
+
+    const breakdown = document.getElementById('revenueBreakdown');
+    if (!courses.length) {
+      breakdown.innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">No courses yet.</p>';
+      return;
+    }
+    const maxRevenue = Math.max(...courses.map(c => (c.price || 0) * (c.enrolled_count || 0)), 1);
+    const gradients = ['var(--primary-gradient)', 'var(--accent-gradient)', 'var(--warm-gradient)'];
+    breakdown.innerHTML = courses.map((c, i) => {
+      const rev = (c.price || 0) * (c.enrolled_count || 0);
+      const pct = Math.round((rev / maxRevenue) * 100);
+      return `<div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm)">
+          <span style="font-size:var(--font-sm)">${c.title}</span>
+          <span style="font-size:var(--font-sm);font-weight:600;color:var(--success)">₹${rev.toLocaleString()}</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${gradients[i % 3]}"></div></div>
+      </div>`;
+    }).join('');
+  }).catch(() => {
+    document.getElementById('stat-total-students').textContent = '\u2014';
+    document.getElementById('stat-total-revenue').textContent = '\u2014';
+  });
+
+  // Load monthly enrollments chart + top students from analytics endpoint
+  apiRequest('/enrollments/instructor/analytics').then(({ monthly, students }) => {
+    // Bar chart
+    const chart = document.getElementById('enrollmentChart');
+    const max = Math.max(...monthly.map(m => m.count), 1);
+    const isLatest = (i) => i === monthly.length - 1;
+    chart.innerHTML = monthly.map((m, i) => {
+      const pct = Math.max(Math.round((m.count / max) * 100), 4);
+      const grad = isLatest(i) ? 'var(--accent-gradient)' : 'var(--primary-gradient)';
+      const labelColor = isLatest(i) ? 'color:var(--accent)' : '';
+      return `<div class="bar" style="height:${pct}%;background:${grad}">
+        <div class="bar-value" style="${labelColor}">${m.count}</div>
+        <span style="${labelColor}">${m.label}</span>
+      </div>`;
+    }).join('');
+
+    // Top students
+    const list = document.getElementById('topStudentsList');
+    if (!students.length) {
+      list.innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">No students enrolled yet.</p>';
+      return;
+    }
+    const rankGradients = ['var(--primary-gradient)', 'var(--accent-gradient)', 'var(--warm-gradient)'];
+    list.innerHTML = students.map((s, i) => `
+      <div class="activity-item">
+        <div class="activity-icon" style="background:${rankGradients[i % 3]};color:white;font-weight:700;font-size:var(--font-xs)">${i + 1}</div>
+        <div class="activity-info">
+          <h4>${s.name}</h4>
+          <p>${s.courseCount} course${s.courseCount !== 1 ? 's' : ''} enrolled</p>
+        </div>
+      </div>`).join('');
+  }).catch(() => {
+    document.getElementById('enrollmentChart').innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">Failed to load chart.</p>';
+    document.getElementById('topStudentsList').innerHTML = '<p style="color:var(--text-muted);font-size:var(--font-sm)">Failed to load students.</p>';
+  });
+});
+</script>
+</body>
+</html>
